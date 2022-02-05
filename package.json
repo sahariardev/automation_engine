@@ -1,0 +1,42 @@
+{
+  "name": "electron-quick-start",
+  "version": "1.0.0",
+  "description": "A minimal Electron application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "repository": "https://github.com/electron/electron-quick-start",
+  "keywords": [
+    "Electron",
+    "quick",
+    "start",
+    "tutorial",
+    "demo"
+  ],
+  "author": "GitHub",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "electron": "^13.1.8",
+    "electron-builder": "^22.11.7"
+  },
+  "dependencies": {
+    "@wdio/cli": "^7.9.0",
+    "csvtojson": "^2.0.10",
+    "dashdash": "^2.0.0",
+    "exec-sh": "^0.4.0",
+    "jquery": "^3.6.0",
+    "puppeteer": "^10.2.0",
+    "puppeteer-core": "^10.2.0",
+    "webdriverio": "^7.16.12",
+    "yargs": "^17.3.1"
+  },
+  "build": {
+    "appId": "com.rifat.sample",
+    "win": {
+      "target": "portable"
+    }
+  }
+}

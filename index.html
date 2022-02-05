@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Automate Your Boring Stuff Bro!</title>
+</head>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+      integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+<script>window.$ = window.jQuery = require('jquery');</script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: white;
+    }
+
+    #preview {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        border: 1px solid grey;
+        background-color: lightgrey;
+    }
+
+    .menu {
+        z-index: +1000;
+        float: left;
+        background: transparent;
+        margin-top: 300px;
+        padding: 10px;
+        position: fixed;
+    }
+
+    .item-container {
+        margin: auto;
+        text-align: center;
+        box-shadow: 0 0 4px 0 grey;
+    }
+
+    .rf-btn {
+        font-size: 20px;
+        padding-left: 10px;
+        padding-right: 10px;
+        cursor: pointer;
+        background-color: white;
+        margin: 1px;
+        border-bottom: 4px white solid;
+    }
+
+    .rf-btn:hover {
+        border-bottom: 4px green solid;
+    }
+
+    #form-container {
+        background-color: #f7f7f7;
+        padding: 20px;
+        font-size: 15px;
+    }
+
+    #meta-container {
+        background-color: #f7f7f7;
+        padding: 20px;
+        font-size: 15px;
+    }
+
+    .action-select {
+        width: 100%;
+        height: 28px;
+    }
+
+    .rf-select {
+        width: 100%;
+        height: 28px;
+    }
+
+    /*#form-container .form-control {*/
+    /*    height: 19px;*/
+    /*    padding: 3px 7px;*/
+    /*    font-size: 9px;*/
+    /*}*/
+</style>
+<body>
+<div class="menu">
+
+    <div class="item-container">
+        <div class="rf-btn fill">
+            <i class="bi bi-cursor-fill"></i>
+        </div>
+
+        <div class="rf-btn click">
+            <i class="bi bi-fan"></i>
+        </div>
+
+        <div class="rf-btn play">
+            <i class="bi bi-play-fill"></i>
+        </div>
+
+        <div class="rf-btn save" id="save">
+            <i class="bi bi-save"></i>
+        </div>
+
+        <div class="rf-btn save" id="load">
+            <i class="bi bi-cloud-arrow-up"></i>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-9">
+        <div id="container" width="100%" height="100%"></div>
+        <div id="preview"></div>
+    </div>
+    <div class="col-md-3">
+        <div class="meta-data" id="meta-container">
+            <div class="mb-3">
+                <label class="form-label">Site Url</label>
+                <input class="form-control" name="siteUtl" id="siteUrl"/>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Save Directory Path</label>
+                <input class="form-control" name="directoryPath" id="directoryPath"/>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">File Name</label>
+                <input class="form-control" name="fileName" id="fileName"/>
+            </div>
+        </div>
+    </div>
+
+    <br/>
+    <div class="col-md-3">
+        <div class="properties" id="form-container">
+            No Item Selected
+        </div>
+    </div>
+</div>
+
+
+<!-- You can also require other files to run in this process -->
+
+<script src="./renderer.js"></script>
+<script src="dependency.js"></script>
+<script src="https://unpkg.com/konva@8/konva.min.js"></script>
+<script src="uiJs/utils.js"></script>
+<script src="uiJs/canvas.js"></script>
+</body>
+</html>
