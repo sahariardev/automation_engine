@@ -64,6 +64,25 @@ class GroupAction extends Action {
             props.startAction = $startAction.val();
         });
     }
+
+    validate() {
+        let message = '';
+
+        if (!this.name) {
+            message += `Action ${this.id}: Name required`;
+        }
+
+        if (!this.startAction) {
+            message += `Action ${this.id}: Start Action required`;
+        }
+
+        // noinspection EqualityComparisonWithCoercionJS
+        if (this.repeat == undefined) {
+            message += `Action ${this.id}: Repeat required`;
+        }
+
+        return message;
+    }
 }
 
 

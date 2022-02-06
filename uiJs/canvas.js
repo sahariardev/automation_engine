@@ -1,36 +1,43 @@
 let selectedBtn = 0;
 
 const btnMap = {
-    0: 'FILL',
-    1: 'CLICK',
+    0: 'MOVE',
+    1: 'DRAW',
     2: 'PLAY',
-    3: 'SAVE'
+    3: 'SAVE',
+    4: 'LOAD',
 }
-
 
 $(function () {
 
     $('#form-container').css('height', window.innerHeight);
 
     updateSelectedBtn($("." + btnMap[selectedBtn].toLowerCase()));
+
     $('.rf-btn').click(function () {
         updateSelectedBtn($(this));
     });
 
-    $('.save').click(function () {
-        $('#save-input').click();
-    });
 });
 
 function updateSelectedBtn($selector) {
+    let selectedBtnKey;
+
     for (const [key, value] of Object.entries(btnMap)) {
         if ($selector.attr('class').split(" ").indexOf(value.toLocaleLowerCase()) >= 0) {
-            selectedBtn = key;
+            selectedBtnKey = key;
+
+            break;
         }
     }
 
-    $('.rf-btn').css('border-bottom', '4px white solid');
-    $selector.css('border-bottom', '4px blue solid');
+    if (![2, 3, 4].includes(selectedBtnKey)) {
+        selectedBtn = selectedBtnKey;
+
+        $('.rf-btn').css('border-bottom', '4px white solid');
+        $selector.css('border-bottom', '4px blue solid');
+    }
+
 }
 
 let stage = new Konva.Stage({
@@ -82,16 +89,104 @@ stage.on('click', function (e) {
             actionList.push(ActionFactory.getAction(props));
         });
 
-        ipcRenderer.send('clicked', JSON.stringify({
+        var data = {
             actions: actionList,
-            siteUrl: 'https://www.google.com/'
-        }));
+            siteUrl: $('#siteUrl').val()
+        }
+
+        if (valid(data)) {
+            ipcRenderer.send('clicked', JSON.stringify(data));
+        }
     }
 });
 
+function valid(data) {
+
+    var errorMessage = '';
+
+    if (!data.siteUrl) {
+        errorMessage += "Invalid site address.";
+    }
+
+    var startActionCount = 0;
+
+    var actionName = {};
+
+    var groupActionList = [];
+
+    if (!data.actions || data.actions.length === 0) {
+        errorMessage += "No action available.";
+    }
+
+    data.actions.forEach(function (action) {
+        if (!action.type) {
+            errorMessage += ` Action Type required: ${action.name};`
+        } else {
+            if (action.type === 'START') {
+                startActionCount++;
+            }
+
+            if (actionName[action.name]) {
+                errorMessage += `Duplicate action name: ${action.name};`
+            } else {
+                actionName[action.name] = 1;
+            }
+
+            if (action.type === 'GROUP') {
+                groupActionList.add(action);
+            }
+
+            errorMessage += action.validate();
+        }
+    });
+
+    if (startActionCount || startActionCount > 1) {
+        errorMessage += 'Multiple Start Action';
+    }
+
+    if (!errorMessage) {
+        groupActionList.forEach(function (action) {
+
+            if (actionName[action.startAction]
+                || action.name === action.startAction
+                || action.name.trim() === action.startAction.trim()) {
+
+                errorMessage += `Invalid Start Action name for group action : ${action.name}`;
+            }
+
+            if (!isValidFile(action.dataSourcePath)) {
+                errorMessage += `Invalid data Source Path for group action : ${action.name}`;
+            }
+        });
+    }
+
+    //show modal for validation
+    showModal(errorMessage, 'Error');
+    return errorMessage === "";
+}
+
+function showModal(body, title) {
+    var $mainModal = $('#mainModal');
+    $mainModal.find('.modal-title').html(title);
+    $mainModal.find('.modal-body').html(body);
+
+    $mainModal.modal('show');
+}
+
+function isValidFile(fileName) {
+    if (!fileName) {
+        return true;
+    }
+
+    if (!fileName.endsWith('.cvs')) {
+        return false;
+    }
+
+    //todo:file exist check
+}
+
 $('#save').click(function () {
 
-    console.log("here I am vro");
     var data = {
         actionsRect: UTIL.getAllActions(),
         siteUrl: $('#siteUrl').val(),
@@ -106,6 +201,26 @@ $('#load').click(function () {
     ipcRenderer.send('loadFile', $('#directoryPath').val() + UTIL.PATH_SEPERATOR + $('#fileName').val());
 });
 
+$('#play').click(function () {
+    var actionsRect = UTIL.getAllActions(),
+        actionList = [];
+
+    UTIL.getAllActions().forEach(function (rect) {
+        var props = rect.attrs;
+        // noinspection JSUnresolvedVariable
+        actionList.push(ActionFactory.getAction(props));
+    });
+
+    var data = {
+        actions: actionList,
+        siteUrl: $('#siteUrl').val()
+    }
+
+    if (valid(data)) {
+        ipcRenderer.send('clicked', JSON.stringify(data));
+    }
+});
+
 ipcRenderer.on('fileLoaded', function (event, data) {
     UTIL.cleanStage();
     console.log(data);
@@ -115,6 +230,4 @@ ipcRenderer.on('fileLoaded', function (event, data) {
     }
     // bind events
 });
-
-
 

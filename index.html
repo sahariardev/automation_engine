@@ -82,6 +82,13 @@
         height: 28px;
     }
 
+    .fade {
+        opacity: 1;
+    }
+
+    .modal-content {
+        margin-top: 100px;
+    }
     /*#form-container .form-control {*/
     /*    height: 19px;*/
     /*    padding: 3px 7px;*/
@@ -92,15 +99,15 @@
 <div class="menu">
 
     <div class="item-container">
-        <div class="rf-btn fill">
+        <div class="rf-btn move">
             <i class="bi bi-cursor-fill"></i>
         </div>
 
-        <div class="rf-btn click">
+        <div class="rf-btn draw">
             <i class="bi bi-fan"></i>
         </div>
 
-        <div class="rf-btn play">
+        <div class="rf-btn play" id="play">
             <i class="bi bi-play-fill"></i>
         </div>
 
@@ -146,6 +153,21 @@
     </div>
 </div>
 
+<div class="modal fade" id="mainModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Error</h5>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- You can also require other files to run in this process -->
 

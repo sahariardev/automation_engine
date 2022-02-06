@@ -72,6 +72,24 @@ class FillAction extends Action {
         // noinspection JSUnresolvedFunction
         await input.addValue(this.value);
     }
+
+    validate() {
+        let message = '';
+
+        if (!this.name) {
+            message += `Action ${this.id}: Name required`;
+        }
+
+        if (!this.path) {
+            message += `Action ${this.id}: Path required`;
+        }
+
+        if (!this.value) {
+            message += `Action ${this.id}: Value required`;
+        }
+
+        return message;
+    }
 }
 
 exports.FillAction = FillAction;

@@ -6,7 +6,7 @@ class Action {
         this.name = name;
     }
 
-    async execute(browser) {
+    execute(browser) {
         throw new Error('Unimplemented');
     }
 }

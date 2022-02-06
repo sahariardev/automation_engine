@@ -48,6 +48,20 @@ class ClickAction extends Action {
         // noinspection JSUnresolvedFunction
         await btn.click();
     }
+
+    validate() {
+        let message = '';
+
+        if (!this.name) {
+            message += `Action ${this.id}: Name required`;
+        }
+
+        if (!this.path) {
+            message += `Action ${this.id}: Path required`;
+        }
+
+        return message;
+    }
 }
 
 exports.ClickAction = ClickAction;
