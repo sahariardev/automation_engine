@@ -98,7 +98,9 @@ var UTIL = function ($, Konva) {
             y: 0,
             width: _constant.BOX_WIDTH,
             height: _constant.BOX_HEIGHT,
-            fill: '#00D2FF'
+            // fill: '#262626',
+            fill: '#90ea8e',
+            shadowBlur: 5,
         });
 
         group.add(box);
@@ -145,10 +147,12 @@ var UTIL = function ($, Konva) {
 
         var arrow = new Konva.Arrow({
             points: [x1, y1, x2, y2],
-            pointerLength: 10,
-            pointerWidth: 10,
-            fill: 'gray',
-            stroke: 'gray',
+            pointerLength: 5,
+            pointerWidth: 5,
+            // fill: 'gray',
+            fill: 'white',
+            stroke: 'white',
+            // stroke: 'gray',
             strokeWidth: 2,
             from: from,
             to: to,
@@ -205,7 +209,7 @@ var UTIL = function ($, Konva) {
             text: text,
             fontSize: 12,
             fontFamily: 'Calibri',
-            fill: '#555',
+            fill: '#0e4a0b',
             width: _constant.BOX_WIDTH,
             padding: 10,
             align: 'center',

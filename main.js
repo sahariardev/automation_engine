@@ -69,8 +69,6 @@ ipcMain.on('loadFile', async (event, arg) => {
 ipcMain.on('clicked', async (event, arg) => {
     var props = JSON.parse(arg);
 
-    var siteUrl = 'https://www.w3schools.com/html/tryit.asp?filename=tryhtml_form_submit';
-
     fs.writeFile('test.json', JSON.stringify(props.actions), err => {
         if (err) {
             console.error(err);

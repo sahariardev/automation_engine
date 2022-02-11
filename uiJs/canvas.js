@@ -31,11 +31,12 @@ function updateSelectedBtn($selector) {
         }
     }
 
-    if (![2, 3, 4].includes(selectedBtnKey)) {
+    if (![2, 3, 4].includes(parseInt(selectedBtnKey))) {
         selectedBtn = selectedBtnKey;
+        console.log(selectedBtnKey);
 
-        $('.rf-btn').css('border-bottom', '4px white solid');
-        $selector.css('border-bottom', '4px blue solid');
+        $('.rf-btn').css('border-bottom', '4px #90ea8e solid');
+        $selector.css('border-bottom', '4px white solid');
     }
 
 }
