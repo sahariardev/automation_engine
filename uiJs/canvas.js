@@ -119,27 +119,29 @@ function valid(data) {
         errorMessage += "No action available.";
     }
 
-    data.actions.forEach(function (action) {
-        if (!action.type) {
-            errorMessage += ` Action Type required: ${action.name};`
-        } else {
-            if (action.type === 'START') {
-                startActionCount++;
-            }
-
-            if (actionName[action.name]) {
-                errorMessage += `Duplicate action name: ${action.name};`
+    if (!errorMessage) {
+        data.actions.forEach(function (action) {
+            if (!action.type) {
+                errorMessage += ` Action Type required: ${action.name};`
             } else {
-                actionName[action.name] = 1;
-            }
+                if (action.type === 'START') {
+                    startActionCount++;
+                }
 
-            if (action.type === 'GROUP') {
-                groupActionList.add(action);
-            }
+                if (actionName[action.name]) {
+                    errorMessage += `Duplicate action name: ${action.name};`
+                } else {
+                    actionName[action.name] = 1;
+                }
 
-            errorMessage += action.validate();
-        }
-    });
+                if (action.type === 'GROUP') {
+                    groupActionList.add(action);
+                }
+
+                errorMessage += action.validate();
+            }
+        });
+    }
 
     if (startActionCount || startActionCount > 1) {
         errorMessage += 'Multiple Start Action';
@@ -148,7 +150,7 @@ function valid(data) {
     if (!errorMessage) {
         groupActionList.forEach(function (action) {
 
-            if (actionName[action.startAction]
+            if (!actionName[action.startAction]
                 || action.name === action.startAction
                 || action.name.trim() === action.startAction.trim()) {
 
@@ -161,8 +163,10 @@ function valid(data) {
         });
     }
 
-    //show modal for validation
-    showModal(errorMessage, 'Error');
+    if (errorMessage) {
+        showModal(errorMessage, 'Error');
+    }
+
     return errorMessage === "";
 }
 
@@ -179,7 +183,7 @@ function isValidFile(fileName) {
         return true;
     }
 
-    if (!fileName.endsWith('.cvs')) {
+    if (!fileName.endsWith('.csv')) {
         return false;
     }
 
