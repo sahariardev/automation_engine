@@ -558,7 +558,7 @@ var UTIL = function ($, Konva) {
     utils.cleanStage = _cleanStage;
     utils.loadStage = _loadStage;
 
-    utils.PATH_SEPERATOR = "/";
+    utils.PATH_SEPERATOR = process.platform === "win32" ?  "\\" : "/";
 
     return utils;
 

@@ -68,7 +68,6 @@ class FillAction extends Action {
     async execute(browser) {
         let input = await browser.$(this.path);
 
-
         // noinspection JSUnresolvedFunction
         await input.addValue(this.value);
     }
