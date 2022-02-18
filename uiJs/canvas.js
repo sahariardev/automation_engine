@@ -138,12 +138,14 @@ function valid(data) {
                     groupActionList.add(action);
                 }
 
-                errorMessage += action.validate();
+                if (action.validate) {
+                    errorMessage += action.validate();
+                }
             }
         });
     }
 
-    if (startActionCount || startActionCount > 1) {
+    if (!startActionCount || startActionCount > 1) {
         errorMessage += 'Multiple Start Action';
     }
 

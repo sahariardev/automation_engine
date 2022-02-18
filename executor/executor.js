@@ -1,17 +1,25 @@
 const {remote} = require('webdriverio');
 const csv = require('csvtojson')
-const fs = require('fs');
 const {ActionFactory} = require("./dto/action_factory");
-const TEMP_FILE_NAME = 'test.json';
+
 
 const READ_FROM_SOURCE_PLACEHOLDER = '#READ_FROM_SOURCE#';
 
-(async (args) => {
+//let's keep this commented code here, will be useful in future for cross platform support
+//const TEMP_FILE_NAME = 'test.json';
+// (async (args) => {
+//
+//     let rawdata = fs.readFileSync(TEMP_FILE_NAME);
+//     let actionList = JSON.parse(rawdata);
+//     let siteUrl = process.argv[2];
+//
+//     console.log('here I am');
+//
+//     execute(siteUrl, actionList);
+// })(process.argv);
 
-    let rawdata = fs.readFileSync(TEMP_FILE_NAME);
-    let actionList = JSON.parse(rawdata);
-
-    let siteUrl = process.argv[2];
+const execute = async (siteUrl, actionList) => {
+    console.log('here I am 2');
 
     const actionGraph = new Map();
     let startAction = null;
@@ -106,5 +114,7 @@ const READ_FROM_SOURCE_PLACEHOLDER = '#READ_FROM_SOURCE#';
 
         return dataSource[dataSourceFileName][index][header];
     }
-})(process.argv);
+}
+
+exports.execute = execute;
 
