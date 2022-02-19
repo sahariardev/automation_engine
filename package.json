@@ -1,22 +1,14 @@
 {
-  "name": "electron-quick-start",
+  "name": "automate_your_boring_stuff_bro",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "description": "UI automation app",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder"
   },
-  "repository": "https://github.com/electron/electron-quick-start",
-  "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
-  ],
-  "author": "GitHub",
+  "author": "Sahariar Alam Khandoker",
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "^13.1.8",
