@@ -2,7 +2,9 @@ const {app, BrowserWindow, ipcMain} = require('electron')
 const path = require('path')
 const fs = require('fs');
 const {execute} = require("./executor/executor");
+const {base64decode, base64encode} = require("nodejs-base64");
 let mainWindow = null;
+const key = "7q7aIcQKp&6X?MU%h8]:(-?G\"nICmX";
 
 function createWindow() {
 
@@ -35,7 +37,9 @@ ipcMain.on('saveFile', async (event, arg) => {
         fileName = fileName + '.sakr';
     }
 
-    fs.writeFile(fileName, arg, err => {
+    var encoded = base64encode(arg) + key;
+
+    fs.writeFile(fileName, encoded, err => {
         if (err) {
             console.error(err);
         }
@@ -47,7 +51,11 @@ ipcMain.on('loadFile', async (event, arg) => {
 
     var filePath = arg.endsWith('.sakr') ? arg : arg + '.sakr';
 
-    var fileContent = JSON.parse(fs.readFileSync(filePath));
+    var enconded = fs.readFileSync(filePath);
+
+    var decodedContent = base64decode(enconded.toString().replace(key, ''));
+
+    var fileContent = JSON.parse(decodedContent);
 
     if (fileContent) {
         mainWindow.webContents.send('fileLoaded', {fileContent: fileContent});

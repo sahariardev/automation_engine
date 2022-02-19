@@ -20,6 +20,7 @@
     "dashdash": "^2.0.0",
     "exec-sh": "^0.4.0",
     "jquery": "^3.6.0",
+    "nodejs-base64": "^2.0.0",
     "puppeteer": "^10.2.0",
     "puppeteer-core": "^10.2.0",
     "webdriverio": "^7.16.12",
