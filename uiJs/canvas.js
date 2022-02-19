@@ -231,7 +231,11 @@ $('#play').click(function () {
 ipcRenderer.on('fileLoaded', function (event, data) {
     UTIL.cleanStage();
     console.log(data);
+
     data = data.fileContent;
+
+    $('#siteUrl').val(data.siteUrl);
+
     if (data && data.actionsRect) {
         UTIL.loadStage(data.actionsRect);
     }
