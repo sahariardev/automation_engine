@@ -145,11 +145,11 @@ function valid(data) {
         });
     }
 
-    if (!startActionCount || startActionCount > 1) {
-        errorMessage += 'Multiple Start Action';
-    }
-
     if (!errorMessage) {
+        if (!startActionCount || startActionCount > 1) {
+            errorMessage += 'Multiple/Invalid Start Action';
+        }
+
         groupActionList.forEach(function (action) {
 
             if (!actionName[action.startAction]
@@ -230,7 +230,6 @@ $('#play').click(function () {
 
 ipcRenderer.on('fileLoaded', function (event, data) {
     UTIL.cleanStage();
-    console.log(data);
 
     data = data.fileContent;
 
