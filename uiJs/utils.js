@@ -74,7 +74,11 @@ var UTIL = function ($, Konva) {
         JS_CODE: {
             displayName: 'Script',
             value: 'JS_CODE'
-        }
+        },
+        SCREENSHOT: {
+            displayName: 'Screenshot',
+            value: 'SCREENSHOT'
+        },
     }
 
     function _init(l, s) {

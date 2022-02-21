@@ -50,6 +50,8 @@ class ActionFactory {
                 return StartAction.generateUi(uiObject);
             case  'JS_CODE' :
                 return JsCodeAction.generateUi(uiObject);
+            case  'SCREENSHOT' :
+                return ScreenshotAction.generateUi(uiObject);
             default:
                 throw new Error("Unsupported type = " + uiObject.type);
         }

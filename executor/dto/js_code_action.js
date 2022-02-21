@@ -47,7 +47,7 @@ class JsCodeAction extends Action {
 
         var f = new Function(this.script);
 
-       await browser.execute(f);
+        await browser.execute(f);
     }
 
     validate() {
