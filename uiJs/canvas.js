@@ -181,6 +181,24 @@ function showModal(body, title) {
     $mainModal.modal('show');
 }
 
+function showConfirmationModal(body, title, yesCallback) {
+    var $confirmation = $('#confirmation-modal');
+    $confirmation.find('.modal-title').html(title);
+    $confirmation.find('.modal-body').html(body);
+
+    if (yesCallback) {
+        $confirmation.find('#modal-yes-btn').click(function () {
+            yesCallback();
+        });
+    } else {
+        $confirmation.find('#modal-yes-btn').click(function () {
+            console.log('no callback assigned');
+        });
+    }
+
+    $confirmation.modal('show');
+}
+
 function isValidFile(fileName) {
     if (!fileName) {
         return true;
@@ -201,7 +219,16 @@ $('#save').click(function () {
         fileName: $('#directoryPath').val() + UTIL.PATH_SEPERATOR + $('#fileName').val()
     };
 
-    ipcRenderer.send('saveFile', JSON.stringify(data));
+    if ($('#fileName').val()) {
+        var formattedFileName = $('#directoryPath').val() ? data.fileName : $('#fileName').val();
+
+        showConfirmationModal(`Are you sure, you want to save file as ${formattedFileName}`, 'Save file', function () {
+            ipcRenderer.send('saveFile', JSON.stringify(data));
+        });
+
+    } else {
+        showModal('Invalid file name', 'Error');
+    }
 
 });
 
