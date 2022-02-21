@@ -52,6 +52,8 @@ class ActionFactory {
                 return JsCodeAction.generateUi(uiObject);
             case  'SCREENSHOT' :
                 return ScreenshotAction.generateUi(uiObject);
+            case  'DELAY' :
+                return DelayAction.generateUi(uiObject);
             default:
                 throw new Error("Unsupported type = " + uiObject.type);
         }

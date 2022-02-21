@@ -79,6 +79,10 @@ var UTIL = function ($, Konva) {
             displayName: 'Screenshot',
             value: 'SCREENSHOT'
         },
+        DELAY: {
+            displayName: 'Wait',
+            value: 'DELAY'
+        },
     }
 
     function _init(l, s) {

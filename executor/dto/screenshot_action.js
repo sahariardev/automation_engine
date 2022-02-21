@@ -21,6 +21,16 @@ class ScreenshotAction extends Action {
     async execute(browser) {
         await browser.saveScreenshot('./' + this.name + '-screenshot.png');
     }
+
+    validate() {
+        let message = '';
+
+        if (!this.name) {
+            message += `Action ${this.id}: Name required`;
+        }
+
+        return message;
+    }
 }
 
 exports.ScreenshotAction = ScreenshotAction;
