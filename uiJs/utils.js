@@ -22,6 +22,11 @@ var UTIL = function ($, Konva) {
             '  <label class="form-label"></label>' +
             '  <input class="form-control" />' +
             '</div>',
+        INPUT_TEXTAREA:
+            '<div class="mb-3">' +
+            '  <label class="form-label"></label>' +
+            '  <textarea  class="form-control" rows="3"></textarea>' +
+            '</div>',
         SUBMIT_BODY:
             '<button type="submit" class="btn btn-primary mb-3">Submit</button>',
         ACTION_SELECT:
@@ -65,6 +70,10 @@ var UTIL = function ($, Konva) {
         START: {
             displayName: 'Start',
             value: 'START'
+        },
+        JS_CODE: {
+            displayName: 'Script',
+            value: 'JS_CODE'
         }
     }
 
@@ -336,6 +345,18 @@ var UTIL = function ($, Konva) {
         return $textInputField;
     }
 
+    function _getInputTextAreaField(label, id, value) {
+        var $textareaInputField = $(_templates.INPUT_TEXTAREA);
+        $textareaInputField.find('.form-label').attr('for', id).html(label);
+        $textareaInputField.find('.form-control').attr('id', id);
+
+        if (value) {
+            $textareaInputField.find('.form-control').val(value);
+        }
+
+        return $textareaInputField;
+    }
+
     function _getSubmitButton() {
         return $(_templates.SUBMIT_BODY);
     }
@@ -566,6 +587,7 @@ var UTIL = function ($, Konva) {
     utils.getCurrenState = _getCurrentState;
     utils.getAllActions = _getAllActions;
     utils.getInputTextField = _getInputTextField;
+    utils.getInputTextAreaField = _getInputTextAreaField;
     utils.getSelectValueTypeSection = _getSelectValueTypeSection;
     utils.cleanStage = _cleanStage;
     utils.loadStage = _loadStage;

@@ -282,4 +282,3 @@ ipcRenderer.on('fileLoaded', function (event, data) {
     }
     // bind events
 });
-
