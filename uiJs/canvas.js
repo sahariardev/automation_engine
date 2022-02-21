@@ -222,7 +222,7 @@ $('#save').click(function () {
     if ($('#fileName').val()) {
         var formattedFileName = $('#directoryPath').val() ? data.fileName : $('#fileName').val();
 
-        showConfirmationModal(`Are you sure, you want to save file as ${formattedFileName}`, 'Save file', function () {
+        showConfirmationModal(`Are you sure, you want to save file as ${formattedFileName}`, 'Save File', function () {
             ipcRenderer.send('saveFile', JSON.stringify(data));
         });
 
@@ -233,7 +233,21 @@ $('#save').click(function () {
 });
 
 $('#load').click(function () {
-    ipcRenderer.send('loadFile', $('#directoryPath').val() + UTIL.PATH_SEPERATOR + $('#fileName').val());
+
+    if ($('#fileName').val()) {
+        var loadPath = $('#directoryPath').val() + UTIL.PATH_SEPERATOR + $('#fileName').val();
+
+        var formattedFileName = $('#directoryPath').val() ? loadPath : $('#fileName').val();
+
+        showConfirmationModal(`Are you sure, you want to load from file  ${formattedFileName}`, 'Load File',
+            function () {
+                ipcRenderer.send('loadFile', loadPath);
+            }
+        );
+
+    } else {
+        showModal('Invalid file name', 'Error');
+    }
 });
 
 $('#play').click(function () {
