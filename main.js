@@ -49,13 +49,10 @@ ipcMain.on('saveFile', async (event, arg) => {
 
 ipcMain.on('loadFile', async (event, arg) => {
 
-    var filePath = arg.endsWith('.sakr') ? arg : arg + '.sakr';
-
-    var enconded = fs.readFileSync(filePath);
-
-    var decodedContent = base64decode(enconded.toString().replace(key, ''));
-
-    var fileContent = JSON.parse(decodedContent);
+    var filePath = arg.endsWith('.sakr') ? arg : arg + '.sakr',
+        enconded = fs.readFileSync(filePath),
+        decodedContent = base64decode(enconded.toString().replace(key, '')),
+        fileContent = JSON.parse(decodedContent);
 
     if (fileContent) {
         mainWindow.webContents.send('fileLoaded', {fileContent: fileContent});

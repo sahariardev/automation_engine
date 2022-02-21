@@ -110,6 +110,18 @@ var UTIL = function ($, Konva) {
                 selectedAction = this;
                 _getFillForm(this.attrs);
 
+            } else if (selectedBtn == 5) {
+                var prevActionId = group.attrs.previousAction,
+                    nextActionId = group.attrs.nextAction;
+                if (prevActionId) {
+                    _destroyArrow(prevActionId);
+                }
+
+                if (nextActionId) {
+                    _destroyArrow(group.attrs.id);
+                }
+
+                group.destroy();
             }
         });
 
@@ -558,7 +570,7 @@ var UTIL = function ($, Konva) {
     utils.cleanStage = _cleanStage;
     utils.loadStage = _loadStage;
 
-    utils.PATH_SEPERATOR = process.platform === "win32" ?  "\\" : "/";
+    utils.PATH_SEPERATOR = process.platform === "win32" ? "\\" : "/";
 
     return utils;
 

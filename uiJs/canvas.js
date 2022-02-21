@@ -3,6 +3,7 @@ let selectedBtn = 0;
 const btnMap = {
     0: 'MOVE',
     1: 'DRAW',
+    5: 'DELETE',
     2: 'PLAY',
     3: 'SAVE',
     4: 'LOAD',
