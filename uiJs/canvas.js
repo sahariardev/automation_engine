@@ -7,6 +7,7 @@ const btnMap = {
     2: 'PLAY',
     3: 'SAVE',
     4: 'LOAD',
+    6: 'AUTHOR',
 }
 
 $(function () {
@@ -32,7 +33,7 @@ function updateSelectedBtn($selector) {
         }
     }
 
-    if (![2, 3, 4].includes(parseInt(selectedBtnKey))) {
+    if (![2, 3, 4, 6].includes(parseInt(selectedBtnKey))) {
         selectedBtn = selectedBtnKey;
         console.log(selectedBtnKey);
 
@@ -250,6 +251,23 @@ $('#load').click(function () {
     }
 });
 
+$('#author').click(function () {
+
+    var body =
+        `
+        <div>
+            <div> Sahariar Alam Khandoker</div>
+            <div>Follow me on:
+                <span id="github-link"><i class="bi bi-github"></i></span> 
+                <span id="instagram-link"><i class="bi bi-instagram"></i></span> 
+            </div>
+            <div>Report Bug on: rifatsahariar@gmail.com</div>
+        </div>
+    `;
+
+    showModal(body, 'Author');
+});
+
 $('#play').click(function () {
     var actionsRect = UTIL.getAllActions(),
         actionList = [];
@@ -281,4 +299,12 @@ ipcRenderer.on('fileLoaded', function (event, data) {
         UTIL.loadStage(data.actionsRect);
     }
     // bind events
+});
+
+$(document).on('click', '#github-link', function (event) {
+    shell.openExternal('https://github.com/sahariardev');
+});
+
+$(document).on('click', '#instagram-link', function (event) {
+    shell.openExternal('https://www.instagram.com/s.a.khandoker/');
 });
