@@ -82,25 +82,28 @@ stage.on('click', function (e) {
         UTIL.getRect(x, y, 'FILL');
     }
 
-    if (selectedBtn == 2) {
-        var actionsRect = UTIL.getAllActions(),
-            actionList = [];
-
-        UTIL.getAllActions().forEach(function (rect) {
-            var props = rect.attrs;
-            // noinspection JSUnresolvedVariable
-            actionList.push(ActionFactory.getAction(props));
-        });
-
-        var data = {
-            actions: actionList,
-            siteUrl: $('#siteUrl').val()
-        }
-
-        if (valid(data)) {
-            ipcRenderer.send('clicked', JSON.stringify(data));
-        }
-    }
+    //will remove next
+    // if (selectedBtn == 2) {
+    //     console.log('hw');
+    //     var actionsRect = UTIL.getAllActions(),
+    //         actionList = [];
+    //
+    //     UTIL.getAllActions().forEach(function (rect) {
+    //         var props = rect.attrs;
+    //         // noinspection JSUnresolvedVariable
+    //         console.log("props is",props);
+    //         actionList.push(ActionFactory.getAction(props));
+    //     });
+    //
+    //     var data = {
+    //         actions: actionList,
+    //         siteUrl: $('#siteUrl').val()
+    //     }
+    //
+    //     if (valid(data)) {
+    //         ipcRenderer.send('clicked', JSON.stringify(data));
+    //     }
+    // }
 });
 
 function valid(data) {
@@ -275,6 +278,11 @@ $('#play').click(function () {
     UTIL.getAllActions().forEach(function (rect) {
         var props = rect.attrs;
         // noinspection JSUnresolvedVariable
+
+        if (props && props.type === 'Fill' && props.valueType === 'ds') {
+            props.value = '#READ_FROM_SOURCE#';
+        }
+
         actionList.push(ActionFactory.getAction(props));
     });
 
