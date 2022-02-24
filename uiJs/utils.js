@@ -83,6 +83,10 @@ var UTIL = function ($, Konva) {
             displayName: 'Wait',
             value: 'DELAY'
         },
+        LOAD_URL: {
+            displayName: 'Load',
+            value: 'LOAD_URL'
+        },
     }
 
     function _init(l, s) {

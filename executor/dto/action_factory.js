@@ -6,6 +6,7 @@ const {FillAction} = require("./fill_action");
 const {ScreenshotAction} = require("./screenshot_action");
 const {ClickAction} = require("./click_action");
 const {JsCodeAction} = require("./js_code_action");
+const {LoadUrlAction} = require("./load_url_action");
 
 class ActionFactory {
 
@@ -31,6 +32,8 @@ class ActionFactory {
                 return StartAction.fromJSON(actionJsonObject);
             case 'JS_CODE':
                 return JsCodeAction.fromJSON(actionJsonObject);
+            case 'LOAD_URL':
+                return LoadUrlAction.fromJSON(actionJsonObject);
         }
     }
 
@@ -54,6 +57,8 @@ class ActionFactory {
                 return ScreenshotAction.generateUi(uiObject);
             case  'DELAY' :
                 return DelayAction.generateUi(uiObject);
+            case  'LOAD_URL' :
+                return LoadUrlAction.generateUi(uiObject);
             default:
                 throw new Error("Unsupported type = " + uiObject.type);
         }
