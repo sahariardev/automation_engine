@@ -1,6 +1,8 @@
 const {remote} = require('webdriverio');
 const csv = require('csvtojson')
 const {ActionFactory} = require("./dto/action_factory");
+const {appendFile} = require("fs/promises");
+var fs = require('fs').promises;
 
 
 const READ_FROM_SOURCE_PLACEHOLDER = '#READ_FROM_SOURCE#';
@@ -44,12 +46,18 @@ const execute = async (siteUrl, actionList) => {
 
     await browser.url(siteUrl);
 
-    await executeAnAction(actionGraph.get(startAction.nextAction));
+    var outputFilename = `./${new Date().toJSON().replaceAll('-', '').replaceAll(':', '').split('.')[0]}-output.txt`;
 
-    async function executeAnAction(action, dataSource, index) {
+    await log(outputFilename, 'Started Executing');
+
+    await executeAnAction(actionGraph.get(startAction.nextAction), null, null, outputFilename);
+
+    async function executeAnAction(action, dataSource, index, outputFilename) {
         if (!action) {
             return;
         }
+
+        await log(outputFilename, `Executing action : ${action.name}, type: ${action.type}`);
 
         if (action.type === 'GROUP') {
             let actionFromList = findActionFromList(action.startAction, actionList);
@@ -62,27 +70,35 @@ const execute = async (siteUrl, actionList) => {
 
             for (let count = 0; count < parseInt(action.repeat); count++) {
                 try {
-                    await executeAnAction(actionFromGraph, action.dataSourcePath, count);
+                    await executeAnAction(actionFromGraph, action.dataSourcePath, count, outputFilename);
                 } catch (error) {
-                    console.log(error);
+
+                    await log(outputFilename, error);
                 }
             }
 
         } else {
             var needDataReset = false;
+
             if (dataSource && (index !== undefined) && action.value === READ_FROM_SOURCE_PLACEHOLDER) {
                 action.value = await getDataFromSource(index, action.name, dataSource);
                 needDataReset = true;
             }
 
-            await action.execute(browser);
+            try {
+                await action.execute(browser);
+            } catch (error) {
+                await log(outputFilename, error);
+
+                throw error;
+            }
 
             if (needDataReset) {
                 action.value = READ_FROM_SOURCE_PLACEHOLDER;
             }
         }
 
-        await executeAnAction(actionGraph.get(action.nextAction), dataSource, index);
+        await executeAnAction(actionGraph.get(action.nextAction), dataSource, index, outputFilename);
     }
 
     function findActionFromList(name, list) {
@@ -113,6 +129,10 @@ const execute = async (siteUrl, actionList) => {
         }
 
         return dataSource[dataSourceFileName][index][header];
+    }
+
+    async function log(fileName, data) {
+        await fs.appendFile(fileName, `${new Date().toISOString()} :: ${data}\n`);
     }
 }
 
