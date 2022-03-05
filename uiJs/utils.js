@@ -135,10 +135,14 @@ var UTIL = function ($, Konva) {
                 var prevActionId = group.attrs.previousAction,
                     nextActionId = group.attrs.nextAction;
                 if (prevActionId) {
+                    var prevAction = _getActionRect(prevActionId);
+                    prevAction.attrs.nextAction = null;
                     _destroyArrow(prevActionId);
                 }
 
                 if (nextActionId) {
+                    var nextAction = _getActionRect(nextActionId);
+                    nextAction.attrs.previousAction = null;
                     _destroyArrow(group.attrs.id);
                 }
 
@@ -587,7 +591,6 @@ var UTIL = function ($, Konva) {
 
             if (props.previousAction) {
 
-                console.log("previous action is", _getActionRect(props.previousAction));
                 _createActionRelationArrow(_getActionRect(props.previousAction), action);
             }
         });
