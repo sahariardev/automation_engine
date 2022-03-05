@@ -1,7 +1,6 @@
 const {remote} = require('webdriverio');
 const csv = require('csvtojson')
 const {ActionFactory} = require("./dto/action_factory");
-const {appendFile} = require("fs/promises");
 var fs = require('fs').promises;
 
 
@@ -21,7 +20,6 @@ const READ_FROM_SOURCE_PLACEHOLDER = '#READ_FROM_SOURCE#';
 // })(process.argv);
 
 const execute = async (siteUrl, actionList) => {
-    console.log('here I am 2');
 
     const actionGraph = new Map();
     let startAction = null;
