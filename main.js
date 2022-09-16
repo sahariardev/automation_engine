@@ -26,9 +26,15 @@ function createWindow() {
 }
 
 ipcMain.on('saveFile', async (event, arg) => {
-    var savedFileInfo = await dialog.showSaveDialog();
+    var savedFileInfo = await dialog.showSaveDialog(
+        {
+            filters: [
+                {name: 'Automation files', extensions: ['sakr']}
+            ]
+        }
+    );
 
-    if(!savedFileInfo || savedFileInfo.canceled) {
+    if (!savedFileInfo || savedFileInfo.canceled) {
         return;
     }
 
@@ -56,7 +62,20 @@ ipcMain.on('saveFile', async (event, arg) => {
 
 ipcMain.on('loadFile', async (event, arg) => {
 
-    var filePath = arg.endsWith('.sakr') ? arg : arg + '.sakr',
+    var selectedFile = await dialog.showOpenDialog({
+        properties: ['openFile'], filters: [
+            {name: 'Automation files', extensions: ['sakr']}
+        ]
+    });
+
+    if (!selectedFile || selectedFile.canceled) {
+        return;
+    }
+    if (!selectedFile.filePaths || !selectedFile.filePaths[0].endsWith('.sakr')) {
+        return;
+    }
+
+    var filePath = selectedFile.filePaths[0],
         enconded = fs.readFileSync(filePath),
         decodedContent = base64decode(enconded.toString().replace(key, '')),
         fileContent = JSON.parse(decodedContent);

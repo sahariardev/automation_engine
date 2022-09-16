@@ -227,20 +227,7 @@ $('#save').click(function () {
 
 $('#load').click(function () {
 
-    if ($('#fileName').val()) {
-        var loadPath = $('#directoryPath').val() + UTIL.PATH_SEPERATOR + $('#fileName').val();
-
-        var formattedFileName = $('#directoryPath').val() ? loadPath : $('#fileName').val();
-
-        showConfirmationModal(`Are you sure, you want to load from file  ${formattedFileName}`, 'Load File',
-            function () {
-                ipcRenderer.send('loadFile', loadPath);
-            }
-        );
-
-    } else {
-        showModal('Invalid file name', 'Error');
-    }
+    ipcRenderer.send('loadFile');
 });
 
 $('#author').click(function () {
