@@ -11,7 +11,7 @@
   "author": "Sahariar Alam Khandoker",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^13.1.8",
+    "electron": "^20.0.0",
     "electron-builder": "^22.11.7"
   },
   "dependencies": {

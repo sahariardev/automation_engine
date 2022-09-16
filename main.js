@@ -1,4 +1,4 @@
-const {app, BrowserWindow, ipcMain} = require('electron')
+const {app, BrowserWindow, ipcMain, dialog} = require('electron')
 const path = require('path')
 const fs = require('fs');
 const {execute} = require("./executor/executor");
@@ -13,7 +13,7 @@ function createWindow() {
         height: 800,
         maximizable: false,
         webPreferences: {
-            devTools: false,
+            devTools: true,
             nodeIntegration: true,
             contextIsolation: false,
             preload: path.join(__dirname, 'preload.js'),
@@ -26,9 +26,15 @@ function createWindow() {
 }
 
 ipcMain.on('saveFile', async (event, arg) => {
+    var savedFileInfo = await dialog.showSaveDialog();
+
+    if(!savedFileInfo || savedFileInfo.canceled) {
+        return;
+    }
+
     var data = JSON.parse(arg);
 
-    var fileName = data.fileName;
+    var fileName = savedFileInfo.filePath;
 
     if (!fileName) {
         return;

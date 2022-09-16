@@ -219,21 +219,10 @@ $('#save').click(function () {
 
     var data = {
         actionsRect: UTIL.getAllActions(),
-        siteUrl: $('#siteUrl').val(),
-        fileName: $('#directoryPath').val() + UTIL.PATH_SEPERATOR + $('#fileName').val()
+        siteUrl: $('#siteUrl').val()
     };
 
-    if ($('#fileName').val()) {
-        var formattedFileName = $('#directoryPath').val() ? data.fileName : $('#fileName').val();
-
-        showConfirmationModal(`Are you sure, you want to save file as ${formattedFileName}`, 'Save File', function () {
-            ipcRenderer.send('saveFile', JSON.stringify(data));
-        });
-
-    } else {
-        showModal('Invalid file name', 'Error');
-    }
-
+    ipcRenderer.send('saveFile', JSON.stringify(data));
 });
 
 $('#load').click(function () {
