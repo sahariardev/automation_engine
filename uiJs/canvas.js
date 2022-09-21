@@ -272,7 +272,16 @@ $('#play').click(function () {
     }
 });
 
+$('#group-cancel').click(function () {
+    UTIL.loadCurrentStage();
+    _processLoadingStage(null, {fileContent : UTIL.getCurrentStageSavedData()});
+});
+
 ipcRenderer.on('fileLoaded', function (event, data) {
+    _processLoadingStage(event, data)
+});
+
+function _processLoadingStage(event, data) {
     UTIL.cleanStage();
 
     data = data.fileContent;
@@ -282,8 +291,7 @@ ipcRenderer.on('fileLoaded', function (event, data) {
     if (data && data.actionsRect) {
         UTIL.loadStage(data.actionsRect);
     }
-    // bind events
-});
+}
 
 $(document).on('click', '#github-link', function (event) {
     shell.openExternal('https://github.com/sahariardev');

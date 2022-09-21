@@ -9,6 +9,8 @@ var UTIL = function ($, Konva) {
         arrowY = null,
         firstClickDone = false,
         tempArrow = null,
+        defaultParent = 'main',
+        parent = defaultParent,
         idCount = 0;
 
     var _constant = {
@@ -112,6 +114,8 @@ var UTIL = function ($, Konva) {
 
         if (elem) {
             Object.assign(group.attrs, elem);
+        } else {
+            group.attrs.uid = v4();
         }
 
         var box = new Konva.Rect({
@@ -147,6 +151,25 @@ var UTIL = function ($, Konva) {
                 }
 
                 group.destroy();
+            }
+        });
+
+        group.on('dblclick', function (e) {
+            if (selectedBtn == 0) {
+                selectedAction = this;
+                if (selectedAction.attrs.type === 'GROUP') {
+                    _saveCurrentStage();
+                    _cleanStage();
+                    parent = selectedAction.attrs.uid;
+                    _showGroupBtn();
+                    //hide siteName
+                    //show component name on top
+                    //allow load from file
+                    // we can edit and save this component under different name
+                    // add done and cancel btn
+                    // if cancel pressed just load the stage
+                    // if done pressed then attach this rects to stage
+                }
             }
         });
 
@@ -596,6 +619,33 @@ var UTIL = function ($, Konva) {
         });
     }
 
+    function _getCurrentStateJSONStr() {
+        var data = {
+            actionsRect: _getAllActions(),
+            siteUrl: $('#siteUrl').val()
+        };
+
+        return JSON.stringify(data);
+    }
+
+    function _saveCurrentStage() {
+        localStorage.setItem('currentStage', _getCurrentStateJSONStr());
+    }
+
+    function _getCurrentStageSavedData() {
+        return JSON.parse(localStorage.getItem('currentStage'));
+    }
+
+    function _loadCurrentStage() {
+        $('.btn-container').hide();
+    }
+
+    function _showGroupBtn() {
+        $('.btn-container').show();
+        $('.properties').css('height', '635px');
+
+    }
+
     utils.getRect = _getRect;
     utils.init = _init;
     utils.getFillForm = _getFillForm;
@@ -606,6 +656,8 @@ var UTIL = function ($, Konva) {
     utils.getSelectValueTypeSection = _getSelectValueTypeSection;
     utils.cleanStage = _cleanStage;
     utils.loadStage = _loadStage;
+    utils.loadCurrentStage = _loadCurrentStage;
+    utils.getCurrentStageSavedData = _getCurrentStageSavedData;
 
     utils.PATH_SEPERATOR = process.platform === "win32" ? "\\" : "/";
 

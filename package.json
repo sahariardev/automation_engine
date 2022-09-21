@@ -18,11 +18,13 @@
     "@wdio/cli": "^7.9.0",
     "csvtojson": "^2.0.10",
     "dashdash": "^2.0.0",
+    "electron-tabs": "^1.0.1",
     "exec-sh": "^0.4.0",
     "jquery": "^3.6.0",
     "nodejs-base64": "^2.0.0",
     "puppeteer": "^10.2.0",
     "puppeteer-core": "^10.2.0",
+    "uuid": "^9.0.0",
     "webdriverio": "^7.16.12",
     "yargs": "^17.3.1"
   },

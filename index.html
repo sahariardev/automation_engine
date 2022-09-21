@@ -70,6 +70,10 @@
         color: white;
     }
 
+    .right-float {
+        float: right;
+    }
+
     .action-select {
         width: 100%;
         height: 28px;
@@ -93,6 +97,10 @@
         color: white;
     }
 
+    .btn-container {
+        display: none;
+    }
+
     .form-control {
         background-color: #424242;
         color: white;
@@ -108,7 +116,8 @@
 
 </style>
 <body>
-<div class="menu">
+
+<div class="menu" id="box">
 
     <div class="item-container">
         <div class="rf-btn move">
@@ -160,6 +169,13 @@
     <div class="col-md-3">
         <div class="properties" id="form-container">
             No Item Selected
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="btn-container" id="btn-container">
+            <button type="button" class="btn btn-secondary" id="group-cancel">Cancel</button>
+            <button type="button" class="btn btn-success right-float" id="group-done">Done</button>
         </div>
     </div>
 </div>
