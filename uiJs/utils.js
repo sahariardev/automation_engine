@@ -116,6 +116,7 @@ var UTIL = function ($, Konva) {
             Object.assign(group.attrs, elem);
         } else {
             group.attrs.uid = v4();
+            group.attrs.parent=parent;
         }
 
         var box = new Konva.Rect({
@@ -162,13 +163,7 @@ var UTIL = function ($, Konva) {
                     _cleanStage();
                     parent = selectedAction.attrs.uid;
                     _showGroupBtn();
-                    //hide siteName
-                    //show component name on top
-                    //allow load from file
-                    // we can edit and save this component under different name
-                    // add done and cancel btn
-                    // if cancel pressed just load the stage
-                    // if done pressed then attach this rects to stage
+                    _loadStage(_getAllSavedActions(), parent);
                 }
             }
         });
@@ -590,13 +585,17 @@ var UTIL = function ($, Konva) {
             .filter(action => action.attrs.id !== selectedAction.attrs.id);
     }
 
-    function _loadStage(children) {
+    function _loadStage(children, parent) {
         if (!children) {
             return;
         }
 
         for (var i = 0; i < children.length; i++) {
             var elem = JSON.parse(children[i]).attrs;
+
+            if (parent && elem.parent != parent) {
+                continue;
+            }
 
             if (elem.elementType === 'action') {
                 _getRect(elem.x, elem.y, elem.type, elem);
@@ -628,12 +627,44 @@ var UTIL = function ($, Konva) {
         return JSON.stringify(data);
     }
 
-    function _saveCurrentStage() {
-        localStorage.setItem('currentStage', _getCurrentStateJSONStr());
+    function _saveCurrentStage(stageData) {
+        stageData = stageData || _getCurrentStateJSONStr();
+
+        localStorage.setItem('currentStage', stageData);
     }
 
     function _getCurrentStageSavedData() {
         return JSON.parse(localStorage.getItem('currentStage'));
+    }
+
+    function _getAllSavedActions() {
+        return _getCurrentStageSavedData().actionsRect;
+    }
+
+    function _saveGroupAction() {
+        var actions = _getAllActions().map(action => action.attrs.parent = parent),
+            savedData = _getCurrentStageSavedData(),
+            cleanedSavedAction = savedData.actionsRect.filter(action => action.attrs.parent !== parent),
+            parentAction = cleanedSavedAction.filter(action => action.attr.uid === parent),
+            startAction = actions.filter(action => action.attr.type === 'START');
+
+        if (startAction.length >= 1) {
+            //show validation
+
+            return;
+        }
+
+        if (startAction.length == 0) {
+            //show validation
+
+            return;
+        }
+
+        parentAction[0].attr.startAction = startAction.attr.name;
+
+        savedData.actionsRect = cleanedSavedAction;
+
+        _saveCurrentStage(savedData);
     }
 
     function _loadCurrentStage() {
@@ -658,6 +689,7 @@ var UTIL = function ($, Konva) {
     utils.loadStage = _loadStage;
     utils.loadCurrentStage = _loadCurrentStage;
     utils.getCurrentStageSavedData = _getCurrentStageSavedData;
+    utils.saveGroupAction = _saveGroupAction;
 
     utils.PATH_SEPERATOR = process.platform === "win32" ? "\\" : "/";
 

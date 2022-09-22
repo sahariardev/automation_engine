@@ -277,6 +277,12 @@ $('#group-cancel').click(function () {
     _processLoadingStage(null, {fileContent : UTIL.getCurrentStageSavedData()});
 });
 
+$('#group-done').click(function () {
+    UTIL.loadCurrentStage();
+    UTIL.saveGroupAction();
+    _processLoadingStage(null, {fileContent : UTIL.getCurrentStageSavedData()});
+});
+
 ipcRenderer.on('fileLoaded', function (event, data) {
     _processLoadingStage(event, data)
 });
