@@ -10,7 +10,7 @@ var UTIL = function ($, Konva) {
         firstClickDone = false,
         tempArrow = null,
         defaultParent = 'main',
-        parent = defaultParent,
+        parentStack = [defaultParent],
         idCount = 0;
 
     var _constant = {
@@ -101,7 +101,7 @@ var UTIL = function ($, Konva) {
         }
     }
 
-    function _getRect(x, y, type, elem) {
+    function _getRect(x, y, type, elem, hideElem) {
         idCount++;
         var group = new Konva.Group({
             x: x,
@@ -113,10 +113,14 @@ var UTIL = function ($, Konva) {
         });
 
         if (elem) {
+            if (elem.parent === defaultParent) {
+               elem.parent = _getParent();
+            }
+
             Object.assign(group.attrs, elem);
         } else {
             group.attrs.uid = v4();
-            group.attrs.parent=parent;
+            group.attrs.parent = _getParent();
         }
 
         var box = new Konva.Rect({
@@ -130,6 +134,13 @@ var UTIL = function ($, Konva) {
         });
 
         group.add(box);
+
+        if(hideElem) {
+            group.hide();
+            group.attrs.hideElem = true;
+        } else {
+            group.attrs.hideElem = false;
+        }
 
         group.on('click', function (e) {
             if (selectedBtn == 0) {
@@ -161,9 +172,9 @@ var UTIL = function ($, Konva) {
                 if (selectedAction.attrs.type === 'GROUP') {
                     _saveCurrentStage();
                     _cleanStage();
-                    parent = selectedAction.attrs.uid;
+                    _setParent(selectedAction.attrs.uid);
                     _showGroupBtn();
-                    _loadStage(_getAllSavedActions(), parent);
+                    _loadStage(_getAllRenderableActions(_getAllSavedActions()));
                 }
             }
         });
@@ -469,7 +480,6 @@ var UTIL = function ($, Konva) {
                     props.value = $valueContainer.val();
 
                     $valueContainer.on('keyup', function () {
-                        console.log($valueContainer.val());
                         props.value = $valueContainer.val();
                     });
                 }
@@ -585,20 +595,20 @@ var UTIL = function ($, Konva) {
             .filter(action => action.attrs.id !== selectedAction.attrs.id);
     }
 
-    function _loadStage(children, parent) {
+    function _loadStage(children) {
         if (!children) {
             return;
         }
 
+        var parent = _getParent();
+
         for (var i = 0; i < children.length; i++) {
             var elem = JSON.parse(children[i]).attrs;
 
-            if (parent && elem.parent != parent) {
-                continue;
-            }
+            var hideElem = elem.parent !== parent;
 
             if (elem.elementType === 'action') {
-                _getRect(elem.x, elem.y, elem.type, elem);
+                _getRect(elem.x, elem.y, elem.type, elem, hideElem);
             }
         }
 
@@ -630,41 +640,89 @@ var UTIL = function ($, Konva) {
     function _saveCurrentStage(stageData) {
         stageData = stageData || _getCurrentStateJSONStr();
 
-        localStorage.setItem('currentStage', stageData);
+        localStorage.setItem(_getParent(), stageData);
     }
 
     function _getCurrentStageSavedData() {
-        return JSON.parse(localStorage.getItem('currentStage'));
+        return JSON.parse(localStorage.getItem(_getParent()));
     }
 
     function _getAllSavedActions() {
         return _getCurrentStageSavedData().actionsRect;
     }
 
+    function _getActionForSave() {
+        return _getAllActions().map(action => {
+            if (!action.attrs.hideElem) {
+                action.attrs.parent = defaultParent;
+            }
+
+            return action;
+        });
+    }
+
+    function _getAllRenderableActions(allActions) {
+        var parent = _getParent(),
+            allRelatedParents = [parent];
+
+        //todo: will optimize in future
+        while (true) {
+            var temp = [];
+
+            for (var i = 0; i < allActions.length; i++) {
+                if (allRelatedParents.indexOf(allActions[i].attrs.parent) >= 0) {
+                    allRelatedParents.push(allActions[i].attrs.uid);
+                    temp.push(allActions[i]);
+                }
+            }
+
+            if (temp.length === 0) {
+                break;
+            }
+        }
+
+        return allActions.filter(action => allRelatedParents.indexOf(action.attrs.parent) >= 0);
+    }
+
+    function _getParent() {
+        if (parentStack && parentStack.length) {
+            return parentStack[parentStack.length - 1];
+        }
+
+        return defaultParent;
+    }
+
+    function _setParent(parent) {
+        parentStack.push(parent);
+    }
+
+    function _popParent() {
+        parentStack.pop();
+    }
+
     function _saveGroupAction() {
-        var actions = _getAllActions().map(action => action.attrs.parent = parent),
+        var parent = _getParent(),
+            actions = _getAllActions().map(action => action.attrs.parent = parent),
             savedData = _getCurrentStageSavedData(),
-            cleanedSavedAction = savedData.actionsRect.filter(action => action.attrs.parent !== parent),
+            cleanedSavedAction = savedData.actionsRect.map(action => JSON.parse(action))
+                .filter(action => action.attrs.parent !== parent),
+
             parentAction = cleanedSavedAction.filter(action => action.attr.uid === parent),
             startAction = actions.filter(action => action.attr.type === 'START');
 
-        if (startAction.length >= 1) {
+        if (startAction.length != 1) {
             //show validation
 
             return;
         }
 
-        if (startAction.length == 0) {
-            //show validation
+        parentAction[0].attrs.startAction = startAction[0].attrs.name;
 
-            return;
-        }
+        var allActions = cleanedSavedAction.map(action => JSON.stringify(action)).concat(actions);
 
-        parentAction[0].attr.startAction = startAction.attr.name;
-
-        savedData.actionsRect = cleanedSavedAction;
-
-        _saveCurrentStage(savedData);
+        savedData.actionsRect = allActions;
+        _saveCurrentStage(JSON.stringify(savedData));
+        _popParent();
     }
 
     function _loadCurrentStage() {
@@ -690,6 +748,9 @@ var UTIL = function ($, Konva) {
     utils.loadCurrentStage = _loadCurrentStage;
     utils.getCurrentStageSavedData = _getCurrentStageSavedData;
     utils.saveGroupAction = _saveGroupAction;
+    utils.popParent = _popParent;
+    utils.getAllChildActions = _getAllRenderableActions;
+    utils.getActionForSave = _getActionForSave;
 
     utils.PATH_SEPERATOR = process.platform === "win32" ? "\\" : "/";
 

@@ -218,9 +218,11 @@ function isValidFile(fileName) {
 $('#save').click(function () {
 
     var data = {
-        actionsRect: UTIL.getAllActions(),
+        actionsRect:UTIL.getActionForSave(),
         siteUrl: $('#siteUrl').val()
     };
+
+    //set parent of all visible items parent to main
 
     ipcRenderer.send('saveFile', JSON.stringify(data));
 });
@@ -273,8 +275,9 @@ $('#play').click(function () {
 });
 
 $('#group-cancel').click(function () {
+    UTIL.popParent();
     UTIL.loadCurrentStage();
-    _processLoadingStage(null, {fileContent : UTIL.getCurrentStageSavedData()});
+    _processLoadingStage(null, {fileContent: UTIL.getCurrentStageSavedData()});
 });
 
 $('#group-done').click(function () {
