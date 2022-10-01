@@ -165,7 +165,12 @@ var UTIL = function ($, Konva) {
                     _destroyArrow(group.attrs.id);
                 }
 
+                var parent = group.attrs.uid,
+                    allChild = _getAllChildActions(_getAllActions(), parent);
+
+                allChild.forEach(action => action.destroy());
                 group.destroy();
+
             }
         });
 
@@ -178,7 +183,7 @@ var UTIL = function ($, Konva) {
                     _showGroupBtn();
                     var allActions = _getAllSavedActions();
                     _setParent(selectedAction.attrs.uid);
-                    var renderableActions = _getAllRenderableActions(allActions, _getParent(),
+                    var renderableActions = _getAllChildActions(allActions, _getParent(),
                         action => JSON.parse(action), action => JSON.stringify(action));
                     _loadStage(renderableActions);
                 }
@@ -676,7 +681,7 @@ var UTIL = function ($, Konva) {
     }
 
     //todo: need to rethink this
-    function _getAllRenderableActions(allActions, selectedParent, deserializer, serializer) {
+    function _getAllChildActions(allActions, selectedParent, deserializer, serializer) {
         var parent = selectedParent || _getParent(),
             allRelatedParents = [],
             tempParents = [parent];
@@ -737,13 +742,15 @@ var UTIL = function ($, Konva) {
     }
 
     function _saveGroupAction() {
-        var parent = _getParent(),
-            oldParent = _popParent(),
-            actions = _getAllActions(),
+        var parent = _getParent();
+
+        _popParent();
+
+        var actions = _getAllActions(),
             savedData = _getCurrentStageSavedData(),
             savedActions = savedData.actionsRect.map(action => JSON.parse(action));
 
-        var deletableActionsId = _getAllRenderableActions(savedActions, parent).map(action => {
+        var deletableActionsId = _getAllChildActions(savedActions, parent).map(action => {
                 console.log("Delete :: ", action.attrs.name + "--" + action.attrs.uid);
                 return action.attrs.uid;
             }),
@@ -826,7 +833,7 @@ var UTIL = function ($, Konva) {
     utils.getCurrentStageSavedData = _getCurrentStageSavedData;
     utils.saveGroupAction = _saveGroupAction;
     utils.popParent = _popParent;
-    utils.getAllChildActions = _getAllRenderableActions;
+    utils.getAllChildActions = _getAllChildActions;
     utils.getActionForSave = _getActionForSave;
     utils.assignActionUID = _assignActionUID;
 
