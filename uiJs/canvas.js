@@ -276,18 +276,26 @@ $('#play').click(function () {
 
 $('#group-cancel').click(function () {
     UTIL.popParent();
-    UTIL.loadCurrentStage();
     _processLoadingStage(null, {fileContent: UTIL.getCurrentStageSavedData()});
+    UTIL.hideGroupBtns();
 });
 
 $('#group-done').click(function () {
-    UTIL.loadCurrentStage();
     UTIL.saveGroupAction();
     _processLoadingStage(null, {fileContent : UTIL.getCurrentStageSavedData()});
+    UTIL.hideGroupBtns();
 });
 
 ipcRenderer.on('fileLoaded', function (event, data) {
-    _processLoadingStage(event, data)
+    UTIL.cleanStage();
+
+    data = data.fileContent;
+
+    $('#siteUrl').val(data.siteUrl);
+
+    if (data && data.actionsRect) {
+        UTIL.loadStage(UTIL.assignActionUID(data.actionsRect));
+    }
 });
 
 function _processLoadingStage(event, data) {
