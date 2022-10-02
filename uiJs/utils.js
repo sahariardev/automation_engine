@@ -786,14 +786,12 @@ var UTIL = function ($, Konva) {
 
     function _hideGroupBtns() {
         if (_getParent() == defaultParent) {
-            $('.btn-container').hide();
+            $('.sub-menu').hide();
         }
     }
 
     function _showGroupBtn() {
-        $('.btn-container').show();
-        $('.properties').css('height', '635px');
-
+        $('.sub-menu').show();
     }
 
     function _assignActionUID(actions) {

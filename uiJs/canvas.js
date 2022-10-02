@@ -274,13 +274,13 @@ $('#play').click(function () {
     }
 });
 
-$('#group-cancel').click(function () {
+$('.component-cancel').click(function () {
     UTIL.popParent();
     _processLoadingStage(null, {fileContent: UTIL.getCurrentStageSavedData()});
     UTIL.hideGroupBtns();
 });
 
-$('#group-done').click(function () {
+$('.component-done').click(function () {
     UTIL.saveGroupAction();
     _processLoadingStage(null, {fileContent : UTIL.getCurrentStageSavedData()});
     UTIL.hideGroupBtns();
