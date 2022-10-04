@@ -1,3 +1,0 @@
-2022-09-28T14:31:41.906Z :: Started Executing
-2022-09-28T14:31:41.909Z :: Executing action : EnterText, type: FILL
-2022-09-28T14:31:42.007Z :: Executing action : PressSearchBtn, type: CLICK

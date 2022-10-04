@@ -126,10 +126,11 @@ function valid(data) {
 
     if (!errorMessage) {
         data.actions.forEach(function (action) {
+            console.log(action);
             if (!action.type) {
                 errorMessage += ` Action Type required: ${action.name};`
             } else {
-                if (action.type === 'START') {
+                if (action.type === 'START' && !action.hideElem) {
                     startActionCount++;
                 }
 
@@ -140,7 +141,7 @@ function valid(data) {
                 }
 
                 if (action.type === 'GROUP') {
-                    groupActionList.add(action);
+                    groupActionList.push(action);
                 }
 
                 if (action.validate) {
@@ -212,6 +213,7 @@ function isValidFile(fileName) {
         return false;
     }
 
+    return true;
     //todo:file exist check
 }
 
@@ -294,7 +296,7 @@ ipcRenderer.on('fileLoaded', function (event, data) {
     $('#siteUrl').val(data.siteUrl);
 
     if (data && data.actionsRect) {
-        UTIL.loadStage(UTIL.assignActionUID(data.actionsRect));
+        UTIL.loadStage(UTIL.assignActionId(data.actionsRect));
     }
 });
 

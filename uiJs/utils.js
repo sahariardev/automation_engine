@@ -102,13 +102,11 @@ var UTIL = function ($, Konva) {
     }
 
     function _getRect(x, y, type, elem, hideElem) {
-        idCount++;
         var group = new Konva.Group({
             x: x,
             y: y,
             draggable: true,
             type: type,
-            id: idCount,
             elementType: 'action',
             visible: true
         });
@@ -120,7 +118,7 @@ var UTIL = function ($, Konva) {
 
             Object.assign(group.attrs, elem);
         } else {
-            group.attrs.uid = v4();
+            group.attrs.id = v4();
             group.attrs.parent = _getParent();
         }
 
@@ -165,7 +163,7 @@ var UTIL = function ($, Konva) {
                     _destroyArrow(group.attrs.id);
                 }
 
-                var parent = group.attrs.uid,
+                var parent = group.attrs.id,
                     allChild = _getAllChildActions(_getAllActions(), parent);
 
                 allChild.forEach(action => action.destroy());
@@ -182,7 +180,7 @@ var UTIL = function ($, Konva) {
                     _cleanStage();
                     _showGroupBtn();
                     var allActions = _getAllSavedActions();
-                    _setParent(selectedAction.attrs.uid);
+                    _setParent(selectedAction.attrs.id);
                     var renderableActions = _getAllChildActions(allActions, _getParent(),
                         action => JSON.parse(action), action => JSON.stringify(action));
                     _loadStage(renderableActions);
@@ -304,7 +302,7 @@ var UTIL = function ($, Konva) {
             $nextActionContainer
                 .find('select')
                 .append($('<option>', {value: props.id})
-                    .html(props.id + (props.name ? '-' + props.name : '')));
+                    .html((props.name ?  props.name : 'No name given')));
         });
 
         $nextActionContainer.find('select').on('change', function () {
@@ -320,7 +318,7 @@ var UTIL = function ($, Konva) {
             }
 
             if ($(this).val() !== 'ps') {
-                var nextActionRect = _getActionRect(parseInt($(this).val()));
+                var nextActionRect = _getActionRect($(this).val());
 
                 if (!nextActionRect || !selectedAction) {
                     return;
@@ -707,7 +705,7 @@ var UTIL = function ($, Konva) {
                 break;
             }
 
-            tempParents = children.map(action => action.attrs.uid);
+            tempParents = children.map(action => action.attrs.id);
         }
 
         return allActions.map(action => {
@@ -751,21 +749,21 @@ var UTIL = function ($, Konva) {
             savedActions = savedData.actionsRect.map(action => JSON.parse(action));
 
         var deletableActionsId = _getAllChildActions(savedActions, parent).map(action => {
-                console.log("Delete :: ", action.attrs.name + "--" + action.attrs.uid);
-                return action.attrs.uid;
+                console.log("Delete :: ", action.attrs.name + "--" + action.attrs.id);
+                return action.attrs.id;
             }),
             cleanedSavedActions = savedActions.filter(action => {
                 console.log(deletableActionsId);
-                console.log(action.attrs.uid, deletableActionsId.indexOf(action.attrs.uid));
+                console.log(action.attrs.id, deletableActionsId.indexOf(action.attrs.id));
 
-                return deletableActionsId.indexOf(action.attrs.uid) < 0;
+                return deletableActionsId.indexOf(action.attrs.id) < 0;
             });
 
         cleanedSavedActions.forEach(function (action) {
-            console.log(action.attrs.name + "-->" + action.attrs.uid);
+            console.log(action.attrs.name + "-->" + action.attrs.id);
         });
 
-        var parentAction = cleanedSavedActions.filter(action => action.attrs.uid === parent),
+        var parentAction = cleanedSavedActions.filter(action => action.attrs.id === parent),
             startAction = actions.filter(action => action.attrs.type === 'START' && !action.attrs.hideElem);
 
         //todo:: run all validation for "run" command
@@ -794,23 +792,25 @@ var UTIL = function ($, Konva) {
         $('.sub-menu').show();
     }
 
-    function _assignActionUID(actions) {
-        var uidMapper = [];
+    function _assignActionId(actions) {
+        var idMapper = [];
 
         actions.forEach(action => {
             action = JSON.parse(action);
-            if (uidMapper.indexOf(action.attrs.uid) < 0) {
-                uidMapper[action.attrs.uid] = v4();
+            if (idMapper.indexOf(action.attrs.id) < 0) {
+                idMapper[action.attrs.id] = v4();
             }
         });
 
         return actions.map(action => {
             action = JSON.parse(action)
 
-            action.attrs.uid = uidMapper[action.attrs.uid];
+            action.attrs.id = idMapper[action.attrs.id];
+            action.attrs.previousAction = idMapper[action.attrs.previousAction];
+            action.attrs.nextAction = idMapper[action.attrs.nextAction];
 
             if (action.attrs.parent !== defaultParent) {
-                action.attrs.parent = uidMapper[action.attrs.parent];
+                action.attrs.parent = idMapper[action.attrs.parent];
             }
 
             return JSON.stringify(action);
@@ -833,7 +833,7 @@ var UTIL = function ($, Konva) {
     utils.popParent = _popParent;
     utils.getAllChildActions = _getAllChildActions;
     utils.getActionForSave = _getActionForSave;
-    utils.assignActionUID = _assignActionUID;
+    utils.assignActionId = _assignActionId;
 
     utils.PATH_SEPERATOR = process.platform === "win32" ? "\\" : "/";
 
