@@ -81,29 +81,6 @@ stage.on('click', function (e) {
     if (selectedBtn == 1) {
         UTIL.getRect(x, y, 'FILL');
     }
-
-    //will remove next
-    // if (selectedBtn == 2) {
-    //     console.log('hw');
-    //     var actionsRect = UTIL.getAllActions(),
-    //         actionList = [];
-    //
-    //     UTIL.getAllActions().forEach(function (rect) {
-    //         var props = rect.attrs;
-    //         // noinspection JSUnresolvedVariable
-    //         console.log("props is",props);
-    //         actionList.push(ActionFactory.getAction(props));
-    //     });
-    //
-    //     var data = {
-    //         actions: actionList,
-    //         siteUrl: $('#siteUrl').val()
-    //     }
-    //
-    //     if (valid(data)) {
-    //         ipcRenderer.send('clicked', JSON.stringify(data));
-    //     }
-    // }
 });
 
 function valid(data) {
