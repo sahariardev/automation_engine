@@ -53,7 +53,6 @@ class FillAction extends Action {
                     props.value = $valueContainer.val();
 
                     $valueContainer.on('keyup', function () {
-                        console.log($valueContainer.val());
                         props.value = $valueContainer.val();
                     });
                 }
