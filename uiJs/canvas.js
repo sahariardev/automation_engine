@@ -83,11 +83,11 @@ stage.on('click', function (e) {
     }
 });
 
-function valid(data) {
+function valid(data, existingErrorMessages, isValidationForComponent) {
 
-    var errorMessage = '';
+    var errorMessage = existingErrorMessages + '';
 
-    if (!data.siteUrl) {
+    if (!data.siteUrl && !isValidationForComponent) {
         errorMessage += "Invalid site address.";
     }
 
@@ -97,13 +97,12 @@ function valid(data) {
 
     var groupActionList = [];
 
-    if (!data.actions || data.actions.length === 0) {
+    if (!errorMessage && (!data.actions || data.actions.length === 0)) {
         errorMessage += "No action available.";
     }
 
     if (!errorMessage) {
         data.actions.forEach(function (action) {
-            console.log(action);
             if (!action.type) {
                 errorMessage += ` Action Type required: ${action.name};`
             } else {
@@ -114,6 +113,11 @@ function valid(data) {
                 if (actionName[action.name]) {
                     errorMessage += `Duplicate action name: ${action.name};`
                 } else {
+
+                    if(isValidationForComponent && UTIL.findDuplicateNamedActions(action.name)) {
+                        errorMessage += `Duplicate action name: ${action.name};`
+                    }
+
                     actionName[action.name] = 1;
                 }
 
@@ -129,10 +133,11 @@ function valid(data) {
     }
 
     if (!errorMessage) {
-        if (!startActionCount || startActionCount > 1) {
-            errorMessage += 'Multiple/Invalid Start Action';
+        if (!startActionCount || startActionCount != 1) {
+            errorMessage += 'Multiple/No Start Action';
         }
 
+        //todo:: this validation wont be needed anymore
         groupActionList.forEach(function (action) {
 
             if (!actionName[action.startAction]
@@ -229,18 +234,25 @@ $('#author').click(function () {
 });
 
 $('#play').click(function () {
-    var actionsRect = UTIL.getAllActions(),
-        actionList = [];
+    var actionList = [],
+        errorMessage = '';
 
     UTIL.getAllActions().forEach(function (rect) {
         var props = rect.attrs;
         // noinspection JSUnresolvedVariable
 
-        if (props && props.type === 'Fill' && props.valueType === 'ds') {
+        if (props.type === 'Fill' && props.valueType === 'ds') {
             props.value = '#READ_FROM_SOURCE#';
         }
 
-        actionList.push(ActionFactory.getAction(props));
+        if (!props.name) {
+            errorMessage += ` Action name is Required`;
+        } else if (!props.type) {
+            errorMessage += ` Invalid Action Type for action ${props.name}`;
+        } else {
+            actionList.push(ActionFactory.getAction(props));
+        }
+
     });
 
     var data = {
@@ -248,7 +260,7 @@ $('#play').click(function () {
         siteUrl: $('#siteUrl').val()
     }
 
-    if (valid(data)) {
+    if (valid(data, errorMessage)) {
         ipcRenderer.send('clicked', JSON.stringify(data));
     }
 });
@@ -260,9 +272,31 @@ $('.component-cancel').click(function () {
 });
 
 $('.component-done').click(function () {
-    UTIL.saveGroupAction();
-    _processLoadingStage(null, {fileContent : UTIL.getCurrentStageSavedData()});
-    UTIL.hideGroupBtns();
+    var actionList = [],
+        errorMessage = '';
+
+    UTIL.getAllActions().forEach(function (rect) {
+        var props = rect.attrs;
+
+        if (!props.name) {
+            errorMessage += ` Action name is Required`;
+        } else if (!props.type) {
+            errorMessage += ` Invalid Action Type for action ${props.name}`;
+        } else {
+            // noinspection JSUnresolvedVariable
+            actionList.push(ActionFactory.getAction(props));
+        }
+    });
+
+    var data = {
+        actions: actionList
+    }
+
+    if (valid(data, errorMessage, true)) {
+        UTIL.saveGroupAction();
+        _processLoadingStage(null, {fileContent: UTIL.getCurrentStageSavedData()});
+        UTIL.hideGroupBtns();
+    }
 });
 
 ipcRenderer.on('fileLoaded', function (event, data) {

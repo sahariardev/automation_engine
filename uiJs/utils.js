@@ -817,6 +817,28 @@ var UTIL = function ($, Konva) {
         });
     }
 
+    function _findDuplicateNamedActions(actionName, id) {
+        var existDuplicate = false;
+
+        parentStack.forEach(parent => {
+           var actions = JSON.parse(localStorage.getItem(parent)).actionsRect;
+            actions.forEach(actionStr => {
+                var action =  JSON.parse(actionStr);
+                if(action.attrs.name === actionName && action.attrs.id !== id) {
+                    existDuplicate = true;
+
+                    return;
+                }
+            });
+
+            if(existDuplicate) {
+                return;
+            }
+        });
+
+        return existDuplicate;
+    }
+
     utils.getRect = _getRect;
     utils.init = _init;
     utils.getFillForm = _getFillForm;
@@ -834,6 +856,7 @@ var UTIL = function ($, Konva) {
     utils.getAllChildActions = _getAllChildActions;
     utils.getActionForSave = _getActionForSave;
     utils.assignActionId = _assignActionId;
+    utils.findDuplicateNamedActions = _findDuplicateNamedActions;
 
     utils.PATH_SEPERATOR = process.platform === "win32" ? "\\" : "/";
 
