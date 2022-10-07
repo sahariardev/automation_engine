@@ -47,7 +47,6 @@ const execute = async (siteUrl, actionList) => {
     var outputFilename = `./${new Date().toJSON().replaceAll('-', '').replaceAll(':', '').split('.')[0]}-output.txt`;
 
     await log(outputFilename, 'Started Executing');
-    await log(outputFilename, `Action graph ${JSON.stringify(actionGraph)}`);
 
     await executeAnAction(actionGraph.get(startAction.nextAction), null, null, outputFilename);
 
@@ -55,8 +54,6 @@ const execute = async (siteUrl, actionList) => {
         if (!action) {
             return;
         }
-
-        await log(outputFilename, `Executing action : ${action.name}, type: ${action.type}, start action : ${action.startAction}`);
 
         if (action.type === 'GROUP') {
             let actionFromList = findActionFromList(action.startAction, actionList);
