@@ -15,6 +15,7 @@ function createWindow() {
         webPreferences: {
             devTools: true,
             nodeIntegration: true,
+            webviewTag: true,
             contextIsolation: false,
             preload: path.join(__dirname, 'preload.js'),
         }

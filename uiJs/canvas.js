@@ -81,36 +81,13 @@ stage.on('click', function (e) {
     if (selectedBtn == 1) {
         UTIL.getRect(x, y, 'FILL');
     }
-
-    //will remove next
-    // if (selectedBtn == 2) {
-    //     console.log('hw');
-    //     var actionsRect = UTIL.getAllActions(),
-    //         actionList = [];
-    //
-    //     UTIL.getAllActions().forEach(function (rect) {
-    //         var props = rect.attrs;
-    //         // noinspection JSUnresolvedVariable
-    //         console.log("props is",props);
-    //         actionList.push(ActionFactory.getAction(props));
-    //     });
-    //
-    //     var data = {
-    //         actions: actionList,
-    //         siteUrl: $('#siteUrl').val()
-    //     }
-    //
-    //     if (valid(data)) {
-    //         ipcRenderer.send('clicked', JSON.stringify(data));
-    //     }
-    // }
 });
 
-function valid(data) {
+function valid(data, existingErrorMessages, isValidationForComponent) {
 
-    var errorMessage = '';
+    var errorMessage = existingErrorMessages + '';
 
-    if (!data.siteUrl) {
+    if (!data.siteUrl && !isValidationForComponent) {
         errorMessage += "Invalid site address.";
     }
 
@@ -120,7 +97,7 @@ function valid(data) {
 
     var groupActionList = [];
 
-    if (!data.actions || data.actions.length === 0) {
+    if (!errorMessage && (!data.actions || data.actions.length === 0)) {
         errorMessage += "No action available.";
     }
 
@@ -129,18 +106,23 @@ function valid(data) {
             if (!action.type) {
                 errorMessage += ` Action Type required: ${action.name};`
             } else {
-                if (action.type === 'START') {
+                if (action.type === 'START' && !action.hideElem) {
                     startActionCount++;
                 }
 
                 if (actionName[action.name]) {
                     errorMessage += `Duplicate action name: ${action.name};`
                 } else {
+
+                    if(isValidationForComponent && UTIL.findDuplicateNamedActions(action.name)) {
+                        errorMessage += `Duplicate action name: ${action.name};`
+                    }
+
                     actionName[action.name] = 1;
                 }
 
                 if (action.type === 'GROUP') {
-                    groupActionList.add(action);
+                    groupActionList.push(action);
                 }
 
                 if (action.validate) {
@@ -151,10 +133,11 @@ function valid(data) {
     }
 
     if (!errorMessage) {
-        if (!startActionCount || startActionCount > 1) {
-            errorMessage += 'Multiple/Invalid Start Action';
+        if (!startActionCount || startActionCount != 1) {
+            errorMessage += 'Multiple/No Start Action';
         }
 
+        //todo:: this validation wont be needed anymore
         groupActionList.forEach(function (action) {
 
             if (!actionName[action.startAction]
@@ -212,15 +195,18 @@ function isValidFile(fileName) {
         return false;
     }
 
+    return true;
     //todo:file exist check
 }
 
 $('#save').click(function () {
 
     var data = {
-        actionsRect: UTIL.getAllActions(),
+        actionsRect:UTIL.getActionForSave(),
         siteUrl: $('#siteUrl').val()
     };
+
+    //set parent of all visible items parent to main
 
     ipcRenderer.send('saveFile', JSON.stringify(data));
 });
@@ -248,18 +234,25 @@ $('#author').click(function () {
 });
 
 $('#play').click(function () {
-    var actionsRect = UTIL.getAllActions(),
-        actionList = [];
+    var actionList = [],
+        errorMessage = '';
 
     UTIL.getAllActions().forEach(function (rect) {
         var props = rect.attrs;
         // noinspection JSUnresolvedVariable
 
-        if (props && props.type === 'Fill' && props.valueType === 'ds') {
+        if (props.type === 'Fill' && props.valueType === 'ds') {
             props.value = '#READ_FROM_SOURCE#';
         }
 
-        actionList.push(ActionFactory.getAction(props));
+        if (!props.name) {
+            errorMessage += ` Action name is Required`;
+        } else if (!props.type) {
+            errorMessage += ` Invalid Action Type for action ${props.name}`;
+        } else {
+            actionList.push(ActionFactory.getAction(props));
+        }
+
     });
 
     var data = {
@@ -267,8 +260,42 @@ $('#play').click(function () {
         siteUrl: $('#siteUrl').val()
     }
 
-    if (valid(data)) {
+    if (valid(data, errorMessage)) {
         ipcRenderer.send('clicked', JSON.stringify(data));
+    }
+});
+
+$('.component-cancel').click(function () {
+    UTIL.popParent();
+    _processLoadingStage(null, {fileContent: UTIL.getCurrentStageSavedData()});
+    UTIL.hideGroupBtns();
+});
+
+$('.component-done').click(function () {
+    var actionList = [],
+        errorMessage = '';
+
+    UTIL.getAllActions().forEach(function (rect) {
+        var props = rect.attrs;
+
+        if (!props.name) {
+            errorMessage += ` Action name is Required`;
+        } else if (!props.type) {
+            errorMessage += ` Invalid Action Type for action ${props.name}`;
+        } else {
+            // noinspection JSUnresolvedVariable
+            actionList.push(ActionFactory.getAction(props));
+        }
+    });
+
+    var data = {
+        actions: actionList
+    }
+
+    if (valid(data, errorMessage, true)) {
+        UTIL.saveGroupAction();
+        _processLoadingStage(null, {fileContent: UTIL.getCurrentStageSavedData()});
+        UTIL.hideGroupBtns();
     }
 });
 
@@ -280,10 +307,21 @@ ipcRenderer.on('fileLoaded', function (event, data) {
     $('#siteUrl').val(data.siteUrl);
 
     if (data && data.actionsRect) {
+        UTIL.loadStage(UTIL.assignActionId(data.actionsRect));
+    }
+});
+
+function _processLoadingStage(event, data) {
+    UTIL.cleanStage();
+
+    data = data.fileContent;
+
+    $('#siteUrl').val(data.siteUrl);
+
+    if (data && data.actionsRect) {
         UTIL.loadStage(data.actionsRect);
     }
-    // bind events
-});
+}
 
 $(document).on('click', '#github-link', function (event) {
     shell.openExternal('https://github.com/sahariardev');

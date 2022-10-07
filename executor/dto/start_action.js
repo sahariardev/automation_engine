@@ -1,14 +1,19 @@
 const {Action} = require("./action");
 
 class StartAction extends Action {
-    constructor(id, nextAction, name) {
+    constructor(id, nextAction, name, hideElem) {
         super(id, null, nextAction, name);
 
+        this.hideElem = hideElem;
         this.type = "START";
     }
 
     static fromJSON(map) {
-        return new StartAction(map['id'], map['nextAction'], map['name']);
+        return new StartAction(map['id'], map['nextAction'], map['name'], map['hideElem']);
+    }
+
+    execute(browser) {
+
     }
 
     /*

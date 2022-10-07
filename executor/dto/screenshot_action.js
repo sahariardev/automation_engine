@@ -19,7 +19,9 @@ class ScreenshotAction extends Action {
     }
 
     async execute(browser) {
-        await browser.saveScreenshot('./' + this.name + '-screenshot.png');
+        await browser.saveScreenshot(`./${this.name}-` + `${new Date().toJSON()
+            .replaceAll('-', '')
+            .replaceAll(':', '').split('.')[0]}-screenshot.png`);
     }
 
     validate() {

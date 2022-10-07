@@ -29,7 +29,7 @@ const execute = async (siteUrl, actionList) => {
     actionList.forEach(function (actionObj) {
         let action = ActionFactory.getAction(actionObj);
 
-        if ((!startAction || action.type === 'START') && !action.previousAction) {
+        if ((!startAction || action.type === 'START') && !action.hideElem && !action.previousAction) {
             startAction = action;
         }
 
@@ -54,8 +54,6 @@ const execute = async (siteUrl, actionList) => {
         if (!action) {
             return;
         }
-
-        await log(outputFilename, `Executing action : ${action.name}, type: ${action.type}`);
 
         if (action.type === 'GROUP') {
             let actionFromList = findActionFromList(action.startAction, actionList);

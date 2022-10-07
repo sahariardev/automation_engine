@@ -9,6 +9,8 @@ var UTIL = function ($, Konva) {
         arrowY = null,
         firstClickDone = false,
         tempArrow = null,
+        defaultParent = 'main',
+        parentStack = [defaultParent],
         idCount = 0;
 
     var _constant = {
@@ -99,19 +101,25 @@ var UTIL = function ($, Konva) {
         }
     }
 
-    function _getRect(x, y, type, elem) {
-        idCount++;
+    function _getRect(x, y, type, elem, hideElem) {
         var group = new Konva.Group({
             x: x,
             y: y,
             draggable: true,
             type: type,
-            id: idCount,
-            elementType: 'action'
+            elementType: 'action',
+            visible: true
         });
 
         if (elem) {
+            if (elem.parent === defaultParent) {
+                elem.parent = _getParent();
+            }
+
             Object.assign(group.attrs, elem);
+        } else {
+            group.attrs.id = v4();
+            group.attrs.parent = _getParent();
         }
 
         var box = new Konva.Rect({
@@ -125,6 +133,15 @@ var UTIL = function ($, Konva) {
         });
 
         group.add(box);
+
+        if (hideElem) {
+            group.hide();
+            group.attrs.hideElem = true;
+
+        } else {
+            group.show();
+            group.attrs.hideElem = false;
+        }
 
         group.on('click', function (e) {
             if (selectedBtn == 0) {
@@ -146,7 +163,28 @@ var UTIL = function ($, Konva) {
                     _destroyArrow(group.attrs.id);
                 }
 
+                var parent = group.attrs.id,
+                    allChild = _getAllChildActions(_getAllActions(), parent);
+
+                allChild.forEach(action => action.destroy());
                 group.destroy();
+
+            }
+        });
+
+        group.on('dblclick', function (e) {
+            if (selectedBtn == 0) {
+                selectedAction = this;
+                if (selectedAction.attrs.type === 'GROUP') {
+                    _saveCurrentStage();
+                    _cleanStage();
+                    _showGroupBtn();
+                    var allActions = _getAllSavedActions();
+                    _setParent(selectedAction.attrs.id);
+                    var renderableActions = _getAllChildActions(allActions, _getParent(),
+                        action => JSON.parse(action), action => JSON.stringify(action));
+                    _loadStage(renderableActions);
+                }
             }
         });
 
@@ -264,7 +302,7 @@ var UTIL = function ($, Konva) {
             $nextActionContainer
                 .find('select')
                 .append($('<option>', {value: props.id})
-                    .html(props.id + (props.name ? '-' + props.name : '')));
+                    .html((props.name ?  props.name : 'No name given')));
         });
 
         $nextActionContainer.find('select').on('change', function () {
@@ -280,7 +318,7 @@ var UTIL = function ($, Konva) {
             }
 
             if ($(this).val() !== 'ps') {
-                var nextActionRect = _getActionRect(parseInt($(this).val()));
+                var nextActionRect = _getActionRect($(this).val());
 
                 if (!nextActionRect || !selectedAction) {
                     return;
@@ -451,7 +489,6 @@ var UTIL = function ($, Konva) {
                     props.value = $valueContainer.val();
 
                     $valueContainer.on('keyup', function () {
-                        console.log($valueContainer.val());
                         props.value = $valueContainer.val();
                     });
                 }
@@ -572,11 +609,19 @@ var UTIL = function ($, Konva) {
             return;
         }
 
+        var parent = _getParent();
+
         for (var i = 0; i < children.length; i++) {
             var elem = JSON.parse(children[i]).attrs;
 
+            if (elem.parent === defaultParent) {
+                elem.parent = parent;
+            }
+
+            var hideElem = elem.parent !== parent;
+
             if (elem.elementType === 'action') {
-                _getRect(elem.x, elem.y, elem.type, elem);
+                _getRect(elem.x, elem.y, elem.type, elem, hideElem);
             }
         }
 
@@ -587,6 +632,10 @@ var UTIL = function ($, Konva) {
 
             var props = action.attrs;
 
+            if (props.hideElem) {
+                return;
+            }
+
             action.add(_getText(0, 0, props.name));
 
             if (props.previousAction) {
@@ -594,6 +643,200 @@ var UTIL = function ($, Konva) {
                 _createActionRelationArrow(_getActionRect(props.previousAction), action);
             }
         });
+    }
+
+    function _getCurrentStateJSONStr() {
+        var data = {
+            actionsRect: _getAllActions(),
+            siteUrl: $('#siteUrl').val()
+        };
+
+        return JSON.stringify(data);
+    }
+
+    function _saveCurrentStage(stageData) {
+        stageData = stageData || _getCurrentStateJSONStr();
+
+        localStorage.setItem(_getParent(), stageData);
+    }
+
+    function _getCurrentStageSavedData() {
+        return JSON.parse(localStorage.getItem(_getParent()));
+    }
+
+    function _getAllSavedActions() {
+        return _getCurrentStageSavedData().actionsRect;
+    }
+
+    function _getActionForSave() {
+        return _getAllActions().map(action => {
+            if (!action.attrs.hideElem) {
+                action.attrs.parent = defaultParent;
+            }
+
+            return action;
+        });
+    }
+
+    //todo: need to rethink this
+    function _getAllChildActions(allActions, selectedParent, deserializer, serializer) {
+        var parent = selectedParent || _getParent(),
+            allRelatedParents = [],
+            tempParents = [parent];
+
+        while (true) {
+            var children = [];
+
+            for (var i = 0; i < allActions.length; i++) {
+                var action = allActions[i];
+
+                if (deserializer) {
+                    action = deserializer(action);
+                }
+
+                if (tempParents.indexOf(action.attrs.parent) >= 0) {
+                    children.push(action);
+                }
+            }
+
+            allRelatedParents = allRelatedParents.concat(tempParents);
+
+            if (children.length === 0) {
+                break;
+            }
+
+            tempParents = children.map(action => action.attrs.id);
+        }
+
+        return allActions.map(action => {
+            if (deserializer) {
+                return deserializer(action);
+            }
+
+            return action;
+        }).filter(action => allRelatedParents.indexOf(action.attrs.parent) >= 0).map(action => {
+            if (serializer) {
+                return serializer(action);
+            }
+
+            return action;
+        });
+    }
+
+    function _getParent() {
+        if (parentStack && parentStack.length) {
+            return parentStack[parentStack.length - 1];
+        }
+
+        return defaultParent;
+    }
+
+    function _setParent(parent) {
+        parentStack.push(parent);
+    }
+
+    function _popParent() {
+        parentStack.pop();
+    }
+
+    function _saveGroupAction() {
+        var parent = _getParent();
+
+        _popParent();
+
+        var actions = _getAllActions(),
+            savedData = _getCurrentStageSavedData(),
+            savedActions = savedData.actionsRect.map(action => JSON.parse(action));
+
+        var deletableActionsId = _getAllChildActions(savedActions, parent).map(action => {
+                console.log("Delete :: ", action.attrs.name + "--" + action.attrs.id);
+                return action.attrs.id;
+            }),
+            cleanedSavedActions = savedActions.filter(action => {
+                console.log(deletableActionsId);
+                console.log(action.attrs.id, deletableActionsId.indexOf(action.attrs.id));
+
+                return deletableActionsId.indexOf(action.attrs.id) < 0;
+            });
+
+        cleanedSavedActions.forEach(function (action) {
+            console.log(action.attrs.name + "-->" + action.attrs.id);
+        });
+
+        var parentAction = cleanedSavedActions.filter(action => action.attrs.id === parent),
+            startAction = actions.filter(action => action.attrs.type === 'START' && !action.attrs.hideElem);
+
+        //todo:: run all validation for "run" command
+
+        if (startAction.length != 1) {
+            //show validation
+
+            return;
+        }
+
+        parentAction[0].attrs.startAction = startAction[0].attrs.name;
+
+        var allActions = cleanedSavedActions.map(action => JSON.stringify(action)).concat(actions);
+
+        savedData.actionsRect = allActions;
+        _saveCurrentStage(JSON.stringify(savedData));
+    }
+
+    function _hideGroupBtns() {
+        if (_getParent() == defaultParent) {
+            $('.sub-menu').hide();
+        }
+    }
+
+    function _showGroupBtn() {
+        $('.sub-menu').show();
+    }
+
+    function _assignActionId(actions) {
+        var idMapper = [];
+
+        actions.forEach(action => {
+            action = JSON.parse(action);
+            if (idMapper.indexOf(action.attrs.id) < 0) {
+                idMapper[action.attrs.id] = v4();
+            }
+        });
+
+        return actions.map(action => {
+            action = JSON.parse(action)
+
+            action.attrs.id = idMapper[action.attrs.id];
+            action.attrs.previousAction = idMapper[action.attrs.previousAction];
+            action.attrs.nextAction = idMapper[action.attrs.nextAction];
+
+            if (action.attrs.parent !== defaultParent) {
+                action.attrs.parent = idMapper[action.attrs.parent];
+            }
+
+            return JSON.stringify(action);
+        });
+    }
+
+    function _findDuplicateNamedActions(actionName, id) {
+        var existDuplicate = false;
+
+        parentStack.forEach(parent => {
+           var actions = JSON.parse(localStorage.getItem(parent)).actionsRect;
+            actions.forEach(actionStr => {
+                var action =  JSON.parse(actionStr);
+                if(action.attrs.name === actionName && action.attrs.id !== id) {
+                    existDuplicate = true;
+
+                    return;
+                }
+            });
+
+            if(existDuplicate) {
+                return;
+            }
+        });
+
+        return existDuplicate;
     }
 
     utils.getRect = _getRect;
@@ -606,6 +849,14 @@ var UTIL = function ($, Konva) {
     utils.getSelectValueTypeSection = _getSelectValueTypeSection;
     utils.cleanStage = _cleanStage;
     utils.loadStage = _loadStage;
+    utils.hideGroupBtns = _hideGroupBtns;
+    utils.getCurrentStageSavedData = _getCurrentStageSavedData;
+    utils.saveGroupAction = _saveGroupAction;
+    utils.popParent = _popParent;
+    utils.getAllChildActions = _getAllChildActions;
+    utils.getActionForSave = _getActionForSave;
+    utils.assignActionId = _assignActionId;
+    utils.findDuplicateNamedActions = _findDuplicateNamedActions;
 
     utils.PATH_SEPERATOR = process.platform === "win32" ? "\\" : "/";
 
