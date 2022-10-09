@@ -302,7 +302,7 @@ var UTIL = function ($, Konva) {
             $nextActionContainer
                 .find('select')
                 .append($('<option>', {value: props.id})
-                    .html((props.name ?  props.name : 'No name given')));
+                    .html((props.name ? props.name : 'No name given')));
         });
 
         $nextActionContainer.find('select').on('change', function () {
@@ -388,7 +388,7 @@ var UTIL = function ($, Konva) {
     }
 
     function _getInputTextField(label, id, value) {
-        var $textInputField = $(_templates.INPUT_FIELD);
+        var $textInputField = $(_templates.INPUT_FIELD).attr('class', `${id}-container`);
         $textInputField.find('.form-label').attr('for', id).html(label);
         $textInputField.find('.form-control').attr('id', id).attr('type', 'TEXT');
 
@@ -601,7 +601,7 @@ var UTIL = function ($, Konva) {
 
     function _getAvailableForNextAction() {
         return _getAllActions().filter(action => !action.attrs.previousAction)
-            .filter(action => action.attrs.id !== selectedAction.attrs.id);
+            .filter(action => action.attrs.id !== selectedAction.attrs.id && !action.attrs.hideElem);
     }
 
     function _loadStage(children) {
@@ -821,17 +821,21 @@ var UTIL = function ($, Konva) {
         var existDuplicate = false;
 
         parentStack.forEach(parent => {
-           var actions = JSON.parse(localStorage.getItem(parent)).actionsRect;
+            if (!localStorage.getItem(parent)) {
+                return;
+            }
+
+            var actions = JSON.parse(localStorage.getItem(parent)).actionsRect;
             actions.forEach(actionStr => {
-                var action =  JSON.parse(actionStr);
-                if(action.attrs.name === actionName && action.attrs.id !== id) {
+                var action = JSON.parse(actionStr);
+                if (action.attrs.name === actionName && action.attrs.id !== id) {
                     existDuplicate = true;
 
                     return;
                 }
             });
 
-            if(existDuplicate) {
+            if (existDuplicate) {
                 return;
             }
         });

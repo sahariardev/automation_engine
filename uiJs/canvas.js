@@ -45,8 +45,8 @@ function updateSelectedBtn($selector) {
 
 let stage = new Konva.Stage({
     container: 'container',
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: window.innerWidth || 1200,
+    height: window.innerHeight || 800,
     draggable: true
 });
 
