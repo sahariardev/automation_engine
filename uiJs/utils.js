@@ -355,6 +355,14 @@ var UTIL = function ($, Konva) {
                 BOTTOM: {
                     x: fromActionRectPos.x + _constant.BOX_WIDTH / 2,
                     y: fromActionRectPos.y + _constant.BOX_HEIGHT
+                },
+                LEFT: {
+                    x: fromActionRectPos.x,
+                    y: fromActionRectPos.y + _constant.BOX_HEIGHT / 2
+                },
+                RIGHT: {
+                    x: fromActionRectPos.x + _constant.BOX_WIDTH,
+                    y: fromActionRectPos.y + _constant.BOX_HEIGHT / 2
                 }
             },
 
@@ -366,16 +374,34 @@ var UTIL = function ($, Konva) {
                 BOTTOM: {
                     x: nextActionRectPos.x + _constant.BOX_WIDTH / 2,
                     y: nextActionRectPos.y + _constant.BOX_HEIGHT
+                },
+                LEFT: {
+                    x: nextActionRectPos.x,
+                    y: nextActionRectPos.y + _constant.BOX_HEIGHT / 2
+                },
+                RIGHT: {
+                    x: nextActionRectPos.x + _constant.BOX_WIDTH,
+                    y: nextActionRectPos.y + _constant.BOX_HEIGHT / 2
                 }
             },
 
             fromPosition = 'BOTTOM',
             nextPosition = 'TOP';
 
-        if (fromActionRectPos.y > nextActionRectPos.y) {
-            fromPosition = 'TOP';
-            nextPosition = 'BOTTOM'
-        }
+        var minDistance = 1000;
+
+        Object.keys(fromActionPositions).forEach((fromActionPosition) => {
+            Object.keys(nextActionPositions).forEach(nextActionPosition => {
+                var distance = Math.pow(Math.pow((nextActionPositions[nextActionPosition].x - fromActionPositions[fromActionPosition].x), 2)
+                    + Math.pow((nextActionPositions[nextActionPosition].y - fromActionPositions[fromActionPosition].y), 2), .5);
+
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    fromPosition = fromActionPosition;
+                    nextPosition = nextActionPosition;
+                }
+            });
+        });
 
         _createArrow(
             fromActionPositions[fromPosition].x,
