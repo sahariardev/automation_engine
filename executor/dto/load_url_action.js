@@ -48,14 +48,15 @@ class LoadUrlAction extends Action {
     }
 
     validate() {
-        let message = '';
+        let message = '',
+            actionLabel = this.name || this.id;
 
         if (!this.name) {
-            message += `Action ${this.id}: Name required`;
+            message += `Action ${actionLabel}: Name required. `;
         }
 
         if (!this.url) {
-            message += `Action ${this.id}: URL required`;
+            message += `Action ${actionLabel}: URL required. `;
         }
 
         return message;

@@ -66,20 +66,23 @@ class GroupAction extends Action {
     }
 
     validate() {
-        let message = '';
+        let message = '',
+            actionLabel = this.name || this.id;
 
         if (!this.name) {
-            message += `Action ${this.id}: Name required`;
+            message += `Action ${actionLabel}: Name required. `;
         }
 
         if (!this.startAction) {
-            message += `Action ${this.id}: Start Action required`;
+            message += `Action ${actionLabel}: Start Action required. `;
         }
 
         // noinspection EqualityComparisonWithCoercionJS
         if (this.repeat == undefined) {
-            message += `Action ${this.id}: Repeat required`;
+            message += `Action ${actionLabel}: Repeat required. `;
         }
+
+        //todo:: file exit validation
 
         return message;
     }

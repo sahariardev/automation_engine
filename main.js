@@ -61,6 +61,17 @@ ipcMain.on('saveFile', async (event, arg) => {
 
 });
 
+ipcMain.on('checkFileValidity', async (event, filePath) => {
+    var file = fs.readFileSync(filePath);
+
+    try {
+        fs.readFileSync(filePath);
+    }
+    catch (e) {
+        console.log("file does not exist");
+    }
+});
+
 ipcMain.on('loadFile', async (event, arg) => {
 
     var selectedFile = await dialog.showOpenDialog({

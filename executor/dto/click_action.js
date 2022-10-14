@@ -50,14 +50,15 @@ class ClickAction extends Action {
     }
 
     validate() {
-        let message = '';
+        let message = '',
+            actionLabel = this.name || this.id;
 
         if (!this.name) {
-            message += `Action ${this.id}: Name required`;
+            message += `Action ${actionLabel}: Name required. `;
         }
 
         if (!this.path) {
-            message += `Action ${this.id}: Path required`;
+            message += `Action ${actionLabel}: Path required. `;
         }
 
         return message;

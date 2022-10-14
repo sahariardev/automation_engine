@@ -51,14 +51,15 @@ class JsCodeAction extends Action {
     }
 
     validate() {
-        let message = '';
+        let message = '',
+            actionLabel = this.name || this.id;
 
         if (!this.name) {
-            message += `Action ${this.id}: Name required`;
+            message += `Action ${actionLabel}: Name required. `;
         }
 
         if (!this.script) {
-            message += `Action ${this.id}: Script required`;
+            message += `Action ${actionLabel}: Script required. `;
         }
 
         return message;

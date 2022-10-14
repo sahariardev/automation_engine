@@ -136,21 +136,6 @@ function valid(data, existingErrorMessages, isValidationForComponent) {
         if (!startActionCount || startActionCount != 1) {
             errorMessage += 'Multiple/No Start Action';
         }
-
-        //todo:: this validation wont be needed anymore
-        groupActionList.forEach(function (action) {
-
-            if (!actionName[action.startAction]
-                || action.name === action.startAction
-                || action.name.trim() === action.startAction.trim()) {
-
-                errorMessage += `Invalid Start Action name for group action : ${action.name}`;
-            }
-
-            if (!isValidFile(action.dataSourcePath)) {
-                errorMessage += `Invalid data Source Path for group action : ${action.name}`;
-            }
-        });
     }
 
     if (errorMessage) {
@@ -184,19 +169,6 @@ function showConfirmationModal(body, title, yesCallback) {
     }
 
     $confirmation.modal('show');
-}
-
-function isValidFile(fileName) {
-    if (!fileName) {
-        return true;
-    }
-
-    if (!fileName.endsWith('.csv')) {
-        return false;
-    }
-
-    return true;
-    //todo:file exist check
 }
 
 $('#save').click(function () {
@@ -279,9 +251,9 @@ $('.component-done').click(function () {
         var props = rect.attrs;
 
         if (!props.name) {
-            errorMessage += ` Action name is Required`;
+            errorMessage += `Action name is Required. `;
         } else if (!props.type) {
-            errorMessage += ` Invalid Action Type for action ${props.name}`;
+            errorMessage += `Invalid Action Type for action ${props.name}. `;
         } else {
             // noinspection JSUnresolvedVariable
             actionList.push(ActionFactory.getAction(props));

@@ -48,14 +48,15 @@ class DelayAction extends Action {
     }
 
     validate() {
-        let message = '';
+        let message = '',
+            actionLabel = this.name || this.id;
 
         if (!this.name) {
-            message += `Action ${this.id}: Name required`;
+            message += `Action ${actionLabel}: Name required. `;
         }
 
         if (!this.duration) {
-            message += `Action ${this.id}: Duration required`;
+            message += `Action ${actionLabel}: Duration required. `;
         }
 
         return message;
